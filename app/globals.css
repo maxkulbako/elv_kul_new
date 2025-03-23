@@ -3,24 +3,43 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --olive-primary: #8c9775;
+  --gradient-end: #5f7237;
+  --gradient-start: #1b1c16;
 }
 
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-olive-primary: var(--olive-primary);
+  --color-gradient-start: var(--gradient-start);
+  --color-gradient-end: var(--gradient-end);
+  --font-sans: var(--font-montserrat);
+  --font-mono: var(--font-montserrat);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer components {
+  .btn-gradient {
+    background: linear-gradient(
+      360deg,
+      var(--gradient-start) 0%,
+      var(--gradient-end) 94%
+    );
+    color: #ffffff;
+    padding: 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: none;
+      color: #42412d;
+    }
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }
