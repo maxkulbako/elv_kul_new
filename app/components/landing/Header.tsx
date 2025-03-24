@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import CallBackButton from "./CallBackButton";
+import CallBackButton from "@/app/components/shared/CallBackButton";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -35,7 +35,13 @@ const Header = () => {
     <div className="bg-olive-primary border-b-[1px] border-[#42412D] relative z-50">
       <header className="flex items-center justify-between px-8 pt-9 pb-3 md:py-4.5 xl:px-24 xl:py-6 relative z-100  max-w-[1240px] mx-auto">
         {/* Logo */}
-        <Image src="/logo.png" alt="main_logo" width={130} height={48} />
+        <Image
+          src="/logo.png"
+          alt="main_logo"
+          width={130}
+          height={48}
+          priority
+        />
 
         {/* Navigation */}
         <nav
@@ -69,7 +75,7 @@ const Header = () => {
 
         {/* Call back button and burger menu */}
         <div className="flex items-center justify-end gap-4">
-          <CallBackButton />
+          <CallBackButton text="Зв'язатися" className="hidden md:block" />
 
           {/* Burger menu */}
           <button
