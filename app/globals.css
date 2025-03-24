@@ -25,7 +25,7 @@
       var(--gradient-start) 0%,
       var(--gradient-end) 94%
     );
-    color: #ffffff;
+    color: var(--color-background);
     padding: 14px;
     border-radius: 100px;
     cursor: pointer;
@@ -34,6 +34,36 @@
     &:hover {
       background: none;
       color: #42412d;
+    }
+  }
+
+  .nav-link {
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--color-background);
+    text-decoration: none;
+    position: relative;
+
+    @media (min-width: 1280px) {
+      &:after {
+        content: "";
+        display: block;
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 0;
+        height: 1px;
+        background-color: var(--color-background);
+        transition: width 0.7s;
+      }
+
+      &:hover:after {
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        height: 1px;
+        background-color: var(--color-background);
+      }
     }
   }
 }
