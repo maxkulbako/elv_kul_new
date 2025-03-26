@@ -158,6 +158,12 @@
   }
 }
 
+@layer utilities {
+  .shadow-olive {
+    box-shadow: -60px 0px 70px -20px rgba(140, 151, 117, 0.6);
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

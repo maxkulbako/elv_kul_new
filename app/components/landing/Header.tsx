@@ -24,6 +24,59 @@ const menuItems = [
   },
 ];
 
+const containerStyles = cn(
+  "bg-olive-primary border-b-[1px] border-[#42412D]",
+  "relative z-50"
+);
+
+const headerStyles = cn(
+  "flex items-center justify-between relative z-100 max-w-[1240px] mx-auto",
+  "px-8 pt-9 pb-3",
+  "md:py-4.5",
+  "xl:px-[20px] xl:py-6",
+  "[@media(min-width:1330px)]:px-[0px]"
+);
+
+const navigationStyles = (isMenuOpen: boolean) =>
+  cn(
+    "fixed top-[87px] left-0 w-full h-screen",
+    "flex flex-col flex-1 items-center justify-start",
+    "backdrop-blur-md bg-olive-primary/80",
+    "transition-all duration-300 p-15",
+    isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible",
+    "xl:static xl:h-auto xl:bg-transparent",
+    "xl:flex-row xl:backdrop-blur-none xl:justify-center xl:p-0",
+    "xl:visible xl:opacity-100"
+  );
+
+const menuListStyles = cn("flex flex-col items-center gap-7.5", "xl:flex-row");
+
+const menuItemStyles = "text-white cursor-pointer font-medium nav-link";
+
+const burgerButtonStyles = cn(
+  "w-[25px] h-[22px]",
+  "xl:hidden cursor-pointer z-100 relative"
+);
+
+const burgerLineStyles = (
+  isMenuOpen: boolean,
+  position: "top" | "middle" | "bottom"
+) =>
+  cn(
+    "absolute left-0 w-full h-0.5 bg-white transition-all ease-in",
+    position === "top" && [
+      "top-0",
+      "duration-300",
+      isMenuOpen && "rotate-45 translate-y-2",
+    ],
+    position === "middle" && ["top-1/2", isMenuOpen && "opacity-0"],
+    position === "bottom" && [
+      "top-full",
+      "duration-300",
+      isMenuOpen && "-translate-y-3.5 -rotate-45",
+    ]
+  );
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -32,8 +85,8 @@ const Header = () => {
   };
 
   return (
-    <div className="bg-olive-primary border-b-[1px] border-[#42412D] relative z-50">
-      <header className="flex items-center justify-between px-8 pt-9 pb-3 md:py-4.5 xl:px-24 xl:py-6 relative z-100  max-w-[1240px] mx-auto">
+    <div className={containerStyles}>
+      <header className={headerStyles}>
         {/* Logo */}
         <Image
           src="/logo.png"
@@ -44,22 +97,12 @@ const Header = () => {
         />
 
         {/* Navigation */}
-        <nav
-          className={cn(
-            "fixed top-[87px] left-0 w-full h-screen backdrop-blur-md bg-olive-primary/80 flex flex-col flex-1 items-center justify-start transition-all duration-300 p-15",
-            "xl:static xl:h-auto xl:bg-transparent xl:flex-row xl:backdrop-blur-none xl:justify-center xl:p-0",
-            isMenuOpen
-              ? "opacity-100 visible"
-              : "opacity-0 invisible xl:visible xl:opacity-100"
-          )}
-        >
-          <ul
-            className={cn("flex flex-col items-center gap-7.5", "xl:flex-row")}
-          >
+        <nav className={navigationStyles(isMenuOpen)}>
+          <ul className={menuListStyles}>
             {menuItems.map((item) => (
               <li key={item.label} className="p-1">
                 <a
-                  className="text-white cursor-pointer font-medium nav-link"
+                  className={menuItemStyles}
                   onClick={() => {
                     console.log(item.label);
                     setIsMenuOpen(false);
@@ -78,28 +121,10 @@ const Header = () => {
           <CallBackButton text="Зв'язатися" className="hidden md:block" />
 
           {/* Burger menu */}
-          <button
-            className="w-[25px] h-[22px] xl:hidden cursor-pointer z-100 relative"
-            onClick={toggleMenu}
-          >
-            <span
-              className={cn(
-                "absolute top-0 left-0 w-full h-0.5 bg-white transition-all ease-in duration-300",
-                isMenuOpen && "rotate-45 translate-y-2"
-              )}
-            ></span>
-            <span
-              className={cn(
-                "absolute top-1/2 left-0 w-full h-0.5 bg-white transition-all ease-in",
-                isMenuOpen && "opacity-0"
-              )}
-            ></span>
-            <span
-              className={cn(
-                "absolute top-full left-0 w-full h-0.5 bg-white transition-all ease-in duration-300",
-                isMenuOpen && "-translate-y-3.5 -rotate-45"
-              )}
-            ></span>
+          <button className={burgerButtonStyles} onClick={toggleMenu}>
+            <span className={burgerLineStyles(isMenuOpen, "top")} />
+            <span className={burgerLineStyles(isMenuOpen, "middle")} />
+            <span className={burgerLineStyles(isMenuOpen, "bottom")} />
           </button>
         </div>
       </header>
