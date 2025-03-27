@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import CallBackButton from "@/app/components/shared/CallBackButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
@@ -39,7 +39,7 @@ const headerStyles = cn(
 
 const navigationStyles = (isMenuOpen: boolean) =>
   cn(
-    "fixed top-[87px] left-0 w-full h-screen",
+    "fixed top-[99px] left-0 w-full h-screen",
     "flex flex-col flex-1 items-center justify-start",
     "backdrop-blur-md bg-olive-primary/80",
     "transition-all duration-300 p-15",
@@ -79,6 +79,18 @@ const burgerLineStyles = (
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMenuOpen]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

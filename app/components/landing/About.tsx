@@ -6,11 +6,11 @@ const containerStyles = cn(
   "max-w-[1240px] mx-auto",
   "px-[32px] py-[60px]",
   "lg:px-[60px]",
-  "xl:py-[100px]"
+  "xl:py-[100px] xl:px-0"
 );
 
 const titleStyles = cn(
-  "text-[28px] font-display text-center",
+  "text-[28px] font-display text-center leading-[120%] tracking-[0%]]",
   "pb-[20px] border-b-[3px] border-olive-primary",
   "lg:max-w-[400px] lg:text-right lg:self-end",
   "xl:text-[48px] xl:max-w-[650px]"
@@ -25,8 +25,9 @@ const imageContainerStyles = cn(
 );
 
 const textContainerStyles = cn(
-  "lg:self-center lg:max-w-[560px]",
-  "xl:pr-[60px]"
+  "max-w-[650px] self-center",
+  "lg:self-center",
+  "xl:pr-[60px] xl:max-w-[605px]"
 );
 
 const About = () => {
@@ -58,7 +59,7 @@ const About = () => {
 
             {/* Text */}
             <div className={textContainerStyles}>
-              <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px]">
+              <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
                 Моя історія
               </h3>
               <p className="text-[16px] xl:text-[20px]">
