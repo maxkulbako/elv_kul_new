@@ -30,7 +30,7 @@ const Programs = () => {
       <div className={containerStyles}>
         <div className="flex flex-col items-center gap-[32px]">
           <p className="text-[16px] italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-start">
-            01
+            06
           </p>
 
           {/* Title */}

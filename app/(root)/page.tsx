@@ -5,6 +5,8 @@ import Themes from "@/app/components/landing/Themes";
 import Prices from "@/app/components/landing/Prices";
 import Confidence from "@/app/components/landing/Confidence";
 import Programs from "@/app/components/landing/Programs";
+import FAQ from "@/app/components/landing/FAQ";
+
 export const metadata: Metadata = {
   title: "Home",
 };
@@ -18,6 +20,7 @@ const HomePage = () => {
       <Prices />
       <Confidence />
       <Programs />
+      <FAQ />
     </div>
   );
 };
