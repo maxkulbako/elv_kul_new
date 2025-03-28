@@ -137,20 +137,25 @@ const Themes = () => {
                 <div
                   key={index}
                   className={cn(
-                    "w-[calc(50%-10px)] h-[70px]",
+                    "w-[calc(50%-10px)] min-h-[70px]",
+                    "px-8 py-4 md:px-10 md:py-5",
                     "flex items-center justify-center relative",
                     "rounded-[148px]",
                     "shadow-[0px_2px_4px_0px_rgba(0,0,0,0.25)]",
                     "bg-olive-primary",
-                    "py-[13px] px-[16px] md:py-4",
-                    "before:content-[url('/quotes.svg')] before:absolute before:top-[5px] before:left-[5px] before:z-1"
+                    "before:content-[url('/quotes.svg')]",
+                    "before:absolute before:top-[50%] before:left-4",
+                    "before:-translate-y-1/2",
+                    "before:opacity-50 before:scale-75"
                   )}
                 >
                   <p
                     className={cn(
                       "text-[10px] md:text-[16px]",
                       "font-medium lg:font-semibold",
-                      "text-white text-center"
+                      "text-white text-center",
+                      "break-words whitespace-normal",
+                      "pl-6"
                     )}
                   >
                     {question}
