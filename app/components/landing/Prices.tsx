@@ -24,32 +24,34 @@ const Prices = () => {
           04
         </p>
         <h2 className={titleStyles}>Тарифи</h2>
-        <div className="flex flex-col items-center justify-between w-full gap-[30px] lg:flex-row">
-          <PriceCard
-            price={500}
-            consultation="1"
-            initial={{ opacity: 0, x: -500 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          />
-          <PriceCard
-            price={2500}
-            consultation="5 + 1"
-            giftNumber={1}
-            isRecommended
-            isHighlighted
-            initial={{ scale: 0.8 }}
-            whileInView={{ scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-          />
-          <PriceCard
-            price={5000}
-            consultation="10 + 2"
-            giftNumber={2}
-            initial={{ opacity: 0, x: 500 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          />
+        <div className="w-full overflow-x-hidden">
+          <div className="flex flex-col items-center justify-between w-full gap-[30px] lg:flex-row">
+            <PriceCard
+              price={500}
+              consultation="1"
+              initial={{ opacity: 0, translateX: -100 }}
+              whileInView={{ opacity: 1, translateX: 0 }}
+              transition={{ duration: 0.5 }}
+            />
+            <PriceCard
+              price={2500}
+              consultation="5 + 1"
+              giftNumber={1}
+              isRecommended
+              isHighlighted
+              initial={{ scale: 0.8 }}
+              whileInView={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            />
+            <PriceCard
+              price={5000}
+              consultation="10 + 2"
+              giftNumber={2}
+              initial={{ opacity: 0, translateX: 100 }}
+              whileInView={{ opacity: 1, translateX: 0 }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
         </div>
         <CallBackButton text="Звʼязатися" />
       </div>

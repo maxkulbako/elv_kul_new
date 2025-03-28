@@ -6,6 +6,8 @@ import Prices from "@/app/components/landing/Prices";
 import Confidence from "@/app/components/landing/Confidence";
 import Programs from "@/app/components/landing/Programs";
 import FAQ from "@/app/components/landing/FAQ";
+import Additional from "@/app/components/landing/Additional";
+import Footer from "@/app/components/landing/Footer";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -21,6 +23,8 @@ const HomePage = () => {
       <Confidence />
       <Programs />
       <FAQ />
+      <Additional />
+      <Footer />
     </div>
   );
 };

@@ -11,7 +11,7 @@ const containerStyles = cn(
 );
 
 const titleStyles = cn(
-  "text-center",
+  "text-center leading-8",
   "xl:text-left xl:leading-11 xl:self-end",
   "area-title animate-fade-in-up opacity-0"
 );
@@ -36,7 +36,7 @@ const imageContainerStyles = cn(
 );
 
 const descriptionStyles = cn(
-  "xl:w-full mx-auto pb-[20px]",
+  "xl:w-full mx-auto py-[20px]",
   "area-text animate-fade-in-up opacity-0 delay-400",
   "xl:justify-self-start"
 );
