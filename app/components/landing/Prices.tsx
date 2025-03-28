@@ -19,6 +19,10 @@ const Prices = () => {
   return (
     <section>
       <div className={containerStyles}>
+        {/* Page number */}
+        <p className="text-[16px] italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-end">
+          04
+        </p>
         <h2 className={titleStyles}>Тарифи</h2>
         <div className="flex flex-col items-center justify-between w-full gap-[30px] lg:flex-row">
           <PriceCard
