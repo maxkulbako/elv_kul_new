@@ -4,7 +4,7 @@ import About from "@/app/components/landing/About";
 import Themes from "@/app/components/landing/Themes";
 import Prices from "@/app/components/landing/Prices";
 import Confidence from "@/app/components/landing/Confidence";
-
+import Programs from "@/app/components/landing/Programs";
 export const metadata: Metadata = {
   title: "Home",
 };
@@ -17,6 +17,7 @@ const HomePage = () => {
       <Themes />
       <Prices />
       <Confidence />
+      <Programs />
     </div>
   );
 };
