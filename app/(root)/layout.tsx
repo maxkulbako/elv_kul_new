@@ -1,5 +1,5 @@
 import Header from "@/app/components/landing/Header";
-
+import Footer from "@/app/components/landing/Footer";
 export default function RootLayout({
   children,
 }: {
@@ -9,6 +9,7 @@ export default function RootLayout({
     <div>
       <Header />
       <main>{children}</main>
+      <Footer />
     </div>
   );
 }

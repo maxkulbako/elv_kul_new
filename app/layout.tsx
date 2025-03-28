@@ -15,7 +15,10 @@ const poiret = Poiret_One({
 });
 
 export const metadata: Metadata = {
-  title: "Elvida Kulbako",
+  title: {
+    default: "Elvida Kulbako",
+    template: "%s | Elvida Kulbako",
+  },
   description: "Elvida Kulbako",
 };
 

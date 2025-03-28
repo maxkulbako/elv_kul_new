@@ -3,4 +3,4 @@ export interface IconProps {
   color?: string;
 }
 
-export type IconName = "telegram" | "instagram" | "facebook";
+export type IconName = "telegram" | "instagram" | "facebook" | "sparkles";

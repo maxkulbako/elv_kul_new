@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import CallBackButton from "@/app/components/shared/CallBackButton";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Icons } from "@/app/components/shared/icons";
 
 const menuItems = [
   {
@@ -53,6 +55,21 @@ const menuListStyles = cn("flex flex-col items-center gap-7.5", "xl:flex-row");
 
 const menuItemStyles = "text-white cursor-pointer font-medium nav-link";
 
+const specialMenuItemStyles = cn(
+  menuItemStyles,
+  "relative group flex items-center gap-2",
+  "before:absolute before:inset-0 before:bg-gradient-to-r before:from-[#919D79]/30 before:to-[#42412D]/30",
+  "before:opacity-0 before:transition-opacity before:duration-300",
+  "hover:before:opacity-100",
+  "after:absolute after:bottom-0 after:left-1/2 after:w-0 after:h-[2px] after:bg-[#F5F6F0]",
+  "after:transition-all after:duration-300",
+  "hover:after:w-full hover:after:left-0",
+  "before:absolute before:bottom-0 before:right-1/2 before:w-0 before:h-[2px] before:bg-[#F5F6F0]",
+  "before:transition-all before:duration-300",
+  "hover:before:w-full hover:before:right-0",
+  "px-3 py-1 rounded-md mx-3 justify-end"
+);
+
 const burgerButtonStyles = cn(
   "w-[25px] h-[22px]",
   "xl:hidden cursor-pointer z-100 relative"
@@ -100,14 +117,15 @@ const Header = () => {
     <div className={containerStyles}>
       <header className={headerStyles}>
         {/* Logo */}
-        <Image
-          src="/logo.png"
-          alt="main_logo"
-          width={130}
-          height={48}
-          priority
-        />
-
+        <Link href="/">
+          <Image
+            src="/logo.png"
+            alt="main_logo"
+            width={130}
+            height={48}
+            priority
+          />
+        </Link>
         {/* Navigation */}
         <nav className={navigationStyles(isMenuOpen)}>
           <ul className={menuListStyles}>
@@ -127,6 +145,19 @@ const Header = () => {
             ))}
           </ul>
         </nav>
+
+        {/* Tests */}
+        <Link href="/tests" className={specialMenuItemStyles}>
+          <Icons.sparkles
+            className="w-4 h-4 text-[#F5F6F0] animate-pulse"
+            color="currentColor"
+          />
+          <span className="text-white">Тести</span>
+          <Icons.sparkles
+            className="w-4 h-4 text-[#F5F6F0] animate-pulse"
+            color="currentColor"
+          />
+        </Link>
 
         {/* Call back button and burger menu */}
         <div className="flex items-center justify-end gap-4">

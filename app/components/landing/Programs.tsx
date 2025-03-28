@@ -1,6 +1,7 @@
 import Image from "next/image";
 import programsImage from "@/public/programs_img_desk.webp";
 import { cn } from "@/lib/utils";
+import ProgramCard from "./ProgramCard";
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto",
@@ -25,6 +26,27 @@ const imageContainerStyles = cn(
 );
 
 const Programs = () => {
+  const programsData = [
+    {
+      title: "Корпоративні лекції",
+      description:
+        "Звертайтесь до мене щодо проведення лекцій чи тренінгів, щоб збільшити ефективність своїх співробітників для збільшення доходу.",
+    },
+    {
+      title: "Некомерційне партнерство",
+      description: "Я активно підтримую ініціативи, які дотичні до психоосвіти",
+    },
+    {
+      title: "Корпоративні лекції",
+      description:
+        "Звертайтесь до мене щодо проведення лекцій чи тренінгів, щоб збільшити ефективність своїх співробітників для збільшення доходу.",
+    },
+    {
+      title: "Некомерційне партнерство",
+      description: "Я активно підтримую ініціативи, які дотичні до психоосвіти",
+    },
+  ];
+
   return (
     <section>
       <div className={containerStyles}>
@@ -39,7 +61,7 @@ const Programs = () => {
             групові"
           </h2>
 
-          {/* Image */}
+          {/* Image and Programs */}
           <div className="flex flex-col gap-[32px] w-full h-full lg:flex-row lg:justify-between">
             <div className={imageContainerStyles}>
               <Image
@@ -51,44 +73,17 @@ const Programs = () => {
               />
             </div>
 
-            {/* Text */}
+            {/* Programs */}
             <div className="flex flex-col gap-[16px] justify-center">
-              <div className="flex flex-col bg-[#F5F6F0] p-[32px] rounded-[4px]">
-                <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
-                  Корпоративні лекції
-                </h3>
-                <p className="text-[16px] text-center lg:text-left xl:text-[20px]">
-                  Звертайтесь до мене щодо проведення лекцій чи тренінгів, щоб
-                  збільшити ефективність своїх співробітників для збільшення
-                  доходу.
-                </p>
-              </div>
-              <div className="flex flex-col bg-[#F5F6F0] p-[32px] rounded-[4px]">
-                <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
-                  Некомерційне партнерство
-                </h3>
-                <p className="text-[16px] text-center lg:text-left xl:text-[20px]">
-                  Я активно підтримую ініціативи, які дотичні до психоосвіти
-                </p>
-              </div>
-              <div className="flex flex-col bg-[#F5F6F0] p-[32px] rounded-[4px]">
-                <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
-                  Корпоративні лекції
-                </h3>
-                <p className="text-[16px] text-center lg:text-left xl:text-[20px]">
-                  Звертайтесь до мене щодо проведення лекцій чи тренінгів, щоб
-                  збільшити ефективність своїх співробітників для збільшення
-                  доходу.
-                </p>
-              </div>
-              <div className="bg-[#F5F6F0] p-[32px] rounded-[4px] hidden xl:flex xl:flex-col">
-                <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
-                  Некомерційне партнерство
-                </h3>
-                <p className="text-[16px] text-center lg:text-left xl:text-[20px]">
-                  Я активно підтримую ініціативи, які дотичні до психоосвіти
-                </p>
-              </div>
+              {programsData.map((program, index) => (
+                <ProgramCard
+                  key={index}
+                  index={index}
+                  title={program.title}
+                  description={program.description}
+                  className={index === 3 ? "hidden xl:flex xl:flex-col" : ""}
+                />
+              ))}
             </div>
           </div>
         </div>
