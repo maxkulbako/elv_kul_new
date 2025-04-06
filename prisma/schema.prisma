@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum SessionStatus {
+  SCHEDULED
+  COMPLETED
+  MISSED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum PaymentMethod {
+  CARD
+  PAYPAL
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(CLIENT)
+
+  accounts  Account[]
+  sessions  Session[]      @relation("ClientSessions")
+  created   Session[]      @relation("AdminSessions")
+  payments  Payment[]
+  pricing   ClientPricing?
+  createdAt DateTime       @default(now())
+
+  sessionToken SessionToken[]
+}
+
+model Session {
+  id            String        @id @default(cuid())
+  date          DateTime
+  durationMin   Int
+  client        User          @relation("ClientSessions", fields: [clientId], references: [id])
+  clientId      String
+  admin         User          @relation("AdminSessions", fields: [adminId], references: [id])
+  adminId       String
+  paymentStatus PaymentStatus @default(PENDING)
+  price         Decimal       @default(0.0)
+  link          String? // Video call link
+  status        SessionStatus @default(SCHEDULED)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  client     User          @relation(fields: [clientId], references: [id])
+  clientId   String
+  amount     Decimal
+  paidAt     DateTime
+  method     PaymentMethod
+  package    Boolean       @default(false)
+  sessionIds String[] // Session IDs this payment covers
+}
+
+model ClientPricing {
+  id           String   @id @default(cuid())
+  client       User     @relation(fields: [clientId], references: [id])
+  clientId     String   @unique
+  price        Decimal
+  packagePrice Decimal?
+  createdAt    DateTime @default(now())
+}
+
+// === NextAuth ===
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model SessionToken {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
