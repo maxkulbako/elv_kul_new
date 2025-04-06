@@ -36,27 +36,28 @@ model User {
   id            String    @id @default(cuid())
   name          String?
   email         String?   @unique
+  password      String?
   emailVerified DateTime?
   image         String?
   role          UserRole  @default(CLIENT)
 
-  accounts  Account[]
-  sessions  Session[]      @relation("ClientSessions")
-  created   Session[]      @relation("AdminSessions")
-  payments  Payment[]
-  pricing   ClientPricing?
-  createdAt DateTime       @default(now())
+  accounts     Account[]
+  appointments Appointment[]  @relation("ClientAppointments")
+  created      Appointment[]  @relation("AdminAppointments")
+  payments     Payment[]
+  pricing      ClientPricing?
+  createdAt    DateTime       @default(now())
 
-  sessionToken SessionToken[]
+  sessionToken Session[]
 }
 
-model Session {
+model Appointment {
   id            String        @id @default(cuid())
   date          DateTime
   durationMin   Int
-  client        User          @relation("ClientSessions", fields: [clientId], references: [id])
+  client        User          @relation("ClientAppointments", fields: [clientId], references: [id])
   clientId      String
-  admin         User          @relation("AdminSessions", fields: [adminId], references: [id])
+  admin         User          @relation("AdminAppointments", fields: [adminId], references: [id])
   adminId       String
   paymentStatus PaymentStatus @default(PENDING)
   price         Decimal       @default(0.0)
@@ -107,7 +108,7 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model SessionToken {
+model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
