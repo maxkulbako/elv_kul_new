@@ -7,13 +7,12 @@ import { Icons } from "../shared/icons";
 const containerStyles = cn(
   "max-w-[1240px] mx-auto flex flex-col items-center justify-center gap-[60px]",
   "px-[32px] py-[60px]",
-  "lg:px-[60px]",
-  "xl:py-[100px]"
+  "lg:px-[60px]"
 );
 
 const Footer = () => {
   return (
-    <footer className="bg-olive-primary">
+    <footer className="bg-[#42412D]">
       <div className={containerStyles}>
         <div className="w-full flex flex-col items-center justify-center gap-[40px] xl:flex-row xl:justify-between">
           <div className="relative w-[44px] h-[44px] block xl:hidden">
