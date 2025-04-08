@@ -1,11 +1,10 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import CallBackButton from "@/app/components/shared/CallBackButton";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/app/components/shared/icons";
+import Navbar from "./Navbar";
 
 const menuItems = [
   {
@@ -95,23 +94,23 @@ const burgerLineStyles = (
   );
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+  // useEffect(() => {
+  //   if (isMenuOpen) {
+  //     document.body.style.overflow = "hidden";
+  //   } else {
+  //     document.body.style.overflow = "";
+  //   }
 
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isMenuOpen]);
+  //   return () => {
+  //     document.body.style.overflow = "";
+  //   };
+  // }, [isMenuOpen]);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  // const toggleMenu = () => {
+  //   setIsMenuOpen(!isMenuOpen);
+  // };
 
   return (
     <div className={containerStyles}>
@@ -127,7 +126,7 @@ const Header = () => {
           />
         </Link>
         {/* Navigation */}
-        <nav className={navigationStyles(isMenuOpen)}>
+        {/* <nav className={navigationStyles(isMenuOpen)}>
           <ul className={menuListStyles}>
             {menuItems.map((item) => (
               <li key={item.label} className="p-1">
@@ -144,10 +143,11 @@ const Header = () => {
               </li>
             ))}
           </ul>
-        </nav>
+        </nav> */}
+        <Navbar />
 
         {/* Tests */}
-        <Link href="/tests" className={specialMenuItemStyles}>
+        {/* <Link href="/tests" className={specialMenuItemStyles}>
           <Icons.sparkles
             className="w-4 h-4 text-[#F5F6F0] animate-pulse"
             color="currentColor"
@@ -157,19 +157,21 @@ const Header = () => {
             className="w-4 h-4 text-[#F5F6F0] animate-pulse"
             color="currentColor"
           />
-        </Link>
+        </Link> */}
 
         {/* Call back button and burger menu */}
-        <div className="flex items-center justify-end gap-4">
-          <CallBackButton text="Зв'язатися" className="hidden md:block" />
+        {/* <div className="flex items-center justify-end gap-4">
+          <Link href="/sign-in">
+            <CallBackButton text="Клієнтський портал" />
+          </Link> */}
 
-          {/* Burger menu */}
-          <button className={burgerButtonStyles} onClick={toggleMenu}>
+        {/* Burger menu */}
+        {/* <button className={burgerButtonStyles} onClick={toggleMenu}>
             <span className={burgerLineStyles(isMenuOpen, "top")} />
             <span className={burgerLineStyles(isMenuOpen, "middle")} />
             <span className={burgerLineStyles(isMenuOpen, "bottom")} />
           </button>
-        </div>
+        </div> */}
       </header>
     </div>
   );

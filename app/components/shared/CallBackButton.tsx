@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils";
 const CallBackButton = ({
   className,
   text,
+  callback,
 }: {
   className?: string;
   text: string;
+  callback?: () => void;
 }) => {
   return (
     <div
@@ -18,7 +20,7 @@ const CallBackButton = ({
     >
       <button
         className="btn-gradient w-full h-full text-[18px] p-[14px] font-semibold flex items-center justify-center"
-        onClick={() => console.log("clicked on call back button")}
+        onClick={callback}
       >
         {text}
       </button>

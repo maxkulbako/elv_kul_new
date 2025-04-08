@@ -29,10 +29,5 @@ export const signInWithCredentials = async (
 
 // sign out user
 export const signOutUser = async () => {
-  try {
-    await signOut();
-    return { success: true, message: "Signed out successfully" };
-  } catch (error) {
-    return { success: false, message: "Failed to sign out" };
-  }
+  await signOut();
 };
