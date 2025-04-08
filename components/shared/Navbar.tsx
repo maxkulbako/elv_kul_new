@@ -35,15 +35,15 @@ const Navbar = async () => {
   return (
     <>
       {/* Navbar for desktop */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <nav className="flex gap-6 item-center">
-          <Link href="/dashboard" className="hidden md:block">
+          <Link href="/client/dashboard" className="hidden md:block">
             <Button className="bg-olive-light text-olive-primary hover:bg-olive-primary hover:text-white">
               <UserIcon className="w-4 h-4" />
               <span className="font-semibold text-[16px] ">Головна</span>
             </Button>
           </Link>
-          <Link href="/appointments" className="hidden md:block">
+          <Link href="/client/appointments" className="hidden md:block">
             <Button className="bg-olive-light text-olive-primary hover:bg-olive-primary hover:text-white">
               <CalendarIcon className="w-4 h-4" />
               <span className="font-semibold text-[16px] ">Записи</span>
@@ -71,7 +71,7 @@ const Navbar = async () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Link
-                  href="/profile"
+                  href="/client/profile"
                   className="flex items-center text-olive-primary hover:bg-olive-light p-2 rounded-md"
                 >
                   <User className="mr-2 h-4 w-4" />
@@ -80,7 +80,7 @@ const Navbar = async () => {
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Link
-                  href="/appointments"
+                  href="/client/appointments"
                   className="flex items-center text-olive-primary hover:bg-olive-light p-2 rounded-md"
                 >
                   <Calendar className="mr-2 h-4 w-4" />
@@ -89,7 +89,7 @@ const Navbar = async () => {
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Link
-                  href="/settings"
+                  href="/client/settings"
                   className="flex items-center text-olive-primary hover:bg-olive-light p-2 rounded-md"
                 >
                   <Settings className="mr-2 h-4 w-4" />

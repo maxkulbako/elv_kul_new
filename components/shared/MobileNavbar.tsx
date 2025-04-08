@@ -13,7 +13,7 @@ const burgerButtonStyles = cn(
 );
 
 const burgerLineStyles = (
-  isMenuOpen: boolean,
+  isOpen: boolean,
   position: "top" | "middle" | "bottom"
 ) =>
   cn(
@@ -21,13 +21,13 @@ const burgerLineStyles = (
     position === "top" && [
       "top-0",
       "duration-300",
-      isMenuOpen && "rotate-45 translate-y-2",
+      isOpen && "rotate-45 translate-y-2",
     ],
-    position === "middle" && ["top-1/2", isMenuOpen && "opacity-0"],
+    position === "middle" && ["top-1/2", isOpen && "opacity-0"],
     position === "bottom" && [
       "top-full",
       "duration-300",
-      isMenuOpen && "-translate-y-3.5 -rotate-45",
+      isOpen && "-translate-y-3.5 -rotate-45",
     ]
   );
 
@@ -36,8 +36,9 @@ const MobileNav = ({ session }: { session: any }) => {
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
+  const user = session?.user;
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button className={burgerButtonStyles} onClick={toggleMenu}>
         <span className={burgerLineStyles(isOpen, "top")} />
         <span className={burgerLineStyles(isOpen, "middle")} />
@@ -47,8 +48,17 @@ const MobileNav = ({ session }: { session: any }) => {
       {isOpen && (
         <div className="absolute top-full left-0 w-full bg-white shadow-lg border-t border-olive-primary/20 animate-slide-in z-50">
           <nav className="flex flex-col p-4 space-y-4">
+            <div className="flex items-center space-x-2 p-2 bg-olive-light rounded-md">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-olive-primary text-white">
+                {user?.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-medium">{user?.name}</p>
+                <p className="text-xs text-muted-foreground">{user?.email}</p>
+              </div>
+            </div>
             <Link
-              href="/dashboard"
+              href="/client/dashboard"
               onClick={() => setIsOpen(false)}
               className="hover:bg-olive-light p-2 rounded-md"
             >
@@ -57,7 +67,7 @@ const MobileNav = ({ session }: { session: any }) => {
               </span>
             </Link>
             <Link
-              href="/appointments"
+              href="/client/appointments"
               onClick={() => setIsOpen(false)}
               className="hover:bg-olive-light p-2 rounded-md"
             >
@@ -66,7 +76,7 @@ const MobileNav = ({ session }: { session: any }) => {
               </span>
             </Link>
             <Link
-              href="/settings"
+              href="/client/settings"
               onClick={() => setIsOpen(false)}
               className="hover:bg-olive-light p-2 rounded-md"
             >

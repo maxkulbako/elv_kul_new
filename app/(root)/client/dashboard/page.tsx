@@ -17,6 +17,7 @@ import {
   Link,
   ChevronRight,
 } from "lucide-react";
+import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
 
 // Mock upcoming appointments data
 const upcomingAppointments = [
@@ -63,10 +64,13 @@ const ClientDashboardPage = async () => {
             Here's an overview of your therapy journey
           </p>
         </div>
-        <Button className="mt-4 sm:mt-0 bg-olive-primary hover:bg-olive-primary/90">
-          <CalendarPlus className="mr-2 h-4 w-4" />
-          Book New Appointment
-        </Button>
+
+        <ScheduleAppointmentClientWrapper>
+          <Button className="mt-4 sm:mt-0 bg-olive-primary hover:bg-olive-primary/90">
+            <CalendarPlus className="mr-2 h-4 w-4" />
+            Book New Appointment
+          </Button>
+        </ScheduleAppointmentClientWrapper>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -191,7 +195,9 @@ const ClientDashboardPage = async () => {
                   </p>
                   <Button className="bg-olive-primary hover:bg-olive-primary/90">
                     <CalendarPlus className="mr-2 h-4 w-4" />
-                    Schedule Now
+                    <ScheduleAppointmentClientWrapper>
+                      Schedule Now
+                    </ScheduleAppointmentClientWrapper>
                   </Button>
                 </div>
               )}
@@ -217,10 +223,13 @@ const ClientDashboardPage = async () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <Button className="w-full justify-start" variant="outline">
-                  <CalendarPlus className="mr-2 h-4 w-4" />
-                  Book New Appointment
-                </Button>
+                <ScheduleAppointmentClientWrapper>
+                  <Button className="w-full justify-start" variant="outline">
+                    <CalendarPlus className="mr-2 h-4 w-4" />
+                    Book New Appointment
+                  </Button>
+                </ScheduleAppointmentClientWrapper>
+
                 <Button className="w-full justify-start" variant="outline">
                   <Video className="mr-2 h-4 w-4" />
                   Test Video Connection

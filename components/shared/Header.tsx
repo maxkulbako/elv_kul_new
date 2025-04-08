@@ -125,6 +125,12 @@ const Header = () => {
             priority
           />
         </Link>
+
+        <Link href="/" className="flex items-center space-x-2">
+          <span className="text-[40px] text-white text-xl font-display font-bold leading-[10px]">
+            MindfulPortal
+          </span>
+        </Link>
         {/* Navigation */}
         {/* <nav className={navigationStyles(isMenuOpen)}>
           <ul className={menuListStyles}>
