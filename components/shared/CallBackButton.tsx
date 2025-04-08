@@ -6,10 +6,12 @@ const CallBackButton = ({
   className,
   text,
   callback,
+  children,
 }: {
   className?: string;
   text: string;
   callback?: () => void;
+  children?: React.ReactNode;
 }) => {
   return (
     <div
@@ -23,6 +25,7 @@ const CallBackButton = ({
         onClick={callback}
       >
         {text}
+        {children}
       </button>
     </div>
   );

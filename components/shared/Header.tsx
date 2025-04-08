@@ -1,10 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import CallBackButton from "@/app/components/shared/CallBackButton";
+import CallBackButton from "@/components/shared/CallBackButton";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Icons } from "@/app/components/shared/icons";
-import Navbar from "./Navbar";
+import { Icons } from "@/components/shared/icons";
+import Navbar from "../shared/Navbar";
 
 const menuItems = [
   {

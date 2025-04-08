@@ -16,20 +16,12 @@ const Footer = () => {
     <footer className="bg-olive-primary">
       <div className={containerStyles}>
         <div className="w-full flex flex-col items-center justify-center gap-[40px] xl:flex-row xl:justify-between">
-          <Image
-            src={smallLogo}
-            alt="logo"
-            width={44}
-            height={44}
-            className="block xl:hidden"
-          />
-          <Image
-            src={logo}
-            alt="logo"
-            width={120}
-            height={120}
-            className="hidden xl:block"
-          />
+          <div className="relative w-[44px] h-[44px] block xl:hidden">
+            <Image src={smallLogo} alt="logo" fill className="object-contain" />
+          </div>
+          <div className="relative w-[120px] h-[120px] hidden xl:block">
+            <Image src={logo} alt="logo" fill className="object-contain" />
+          </div>
           <div className="text-white text-[18px] text-center">
             <p>+38 098 123 45 67</p>
             <p>home@psy-elvida.com</p>

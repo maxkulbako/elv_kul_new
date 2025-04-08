@@ -1,12 +1,12 @@
 import { Metadata } from "next";
-import Hero from "@/app/components/landing/Hero";
-import About from "@/app/components/landing/About";
-import Themes from "@/app/components/landing/Themes";
-import Prices from "@/app/components/landing/Prices";
-import Confidence from "@/app/components/landing/Confidence";
-import Programs from "@/app/components/landing/Programs";
-import FAQ from "@/app/components/landing/FAQ";
-import Additional from "@/app/components/landing/Additional";
+import Hero from "@/components/landing/Hero";
+import About from "@/components/landing/About";
+import Themes from "@/components/landing/Themes";
+import Prices from "@/components/landing/Prices";
+import Confidence from "@/components/landing/Confidence";
+import Programs from "@/components/landing/Programs";
+import FAQ from "@/components/landing/FAQ";
+import Additional from "@/components/landing/Additional";
 
 export const metadata: Metadata = {
   title: "Home",
