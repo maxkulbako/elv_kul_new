@@ -54,7 +54,7 @@ const CredentialsSignInForm = () => {
         className="w-full !bg-olive-primary hover:opacity-90 !text-bold"
         disabled={isPending}
       >
-        {isPending ? "Logging in..." : "Login"}
+        {isPending ? "Вхід..." : "Вхід"}
       </Button>
 
       {data && !data.success && (

@@ -19,13 +19,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { scheduleAppointment } from "@/lib/actions/appointment.action";
+import { useActionState } from "react";
 
 type ScheduleAppointmentDialogProps = {
   isOpen: boolean;
   onClose: () => void;
   isRescheduling?: boolean;
   existingDate?: Date;
-  onSchedule: (date: Date, timeSlot: string) => void;
 };
 
 const timeSlots = [
@@ -43,18 +44,29 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
   onClose,
   isRescheduling = false,
   existingDate,
-  onSchedule,
 }) => {
   const [date, setDate] = useState<Date | undefined>(existingDate || undefined);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string | null>(
-    existingDate ? format(existingDate, "h:mm a") : null
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(
+    existingDate ? format(existingDate, "h:mm a") : ""
   );
 
-  const handleSchedule = () => {
-    if (date && selectedTimeSlot) {
-      onSchedule(date, selectedTimeSlot);
-      onClose();
-    }
+  const [state, action, isPending] = useActionState(scheduleAppointment, {
+    success: false,
+    message: "",
+  });
+
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate);
+  };
+
+  const handleSubmit = (formData: FormData) => {
+    if (!date || !selectedTimeSlot) return;
+
+    formData.set("date", date.toISOString());
+    formData.set("time", selectedTimeSlot);
+
+    action(formData);
+    onClose();
   };
 
   return (
@@ -71,7 +83,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
+        <form action={handleSubmit} className="flex flex-col gap-4">
           <div className="grid gap-2">
             <label className="text-sm font-medium">Date</label>
             <Popover>
@@ -82,6 +94,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
                     "w-full pl-3 text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
+                  type="button"
                 >
                   {date ? format(date, "PPP") : "Select a date"}
                   <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
@@ -91,7 +104,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={handleDateSelect}
                   disabled={(date) => {
                     // Disable past dates and weekends (Saturday and Sunday)
                     const day = date.getDay();
@@ -121,6 +134,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
                       : "border-olive-primary text-olive-primary"
                   )}
                   onClick={() => setSelectedTimeSlot(time)}
+                  type="button"
                 >
                   <Clock className="mr-1 h-3 w-3" />
                   {time}
@@ -128,20 +142,24 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
               ))}
             </div>
           </div>
-        </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            className="bg-olive-primary hover:bg-olive-primary/90"
-            disabled={!date || !selectedTimeSlot}
-            onClick={handleSchedule}
-          >
-            {isRescheduling ? "Reschedule" : "Schedule"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button variant="outline" type="button" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              className="bg-olive-primary hover:bg-olive-primary/90"
+              type="submit"
+              disabled={!date || !selectedTimeSlot || isPending}
+            >
+              {isPending
+                ? "Scheduling..."
+                : isRescheduling
+                ? "Reschedule"
+                : "Schedule"}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -32,6 +32,13 @@ enum PaymentMethod {
   PAYPAL
 }
 
+enum PricingType {
+  GLOBAL_SINGLE
+  GLOBAL_PACKAGE
+  CLIENT_SINGLE
+  CLIENT_PACKAGE
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -42,11 +49,11 @@ model User {
   role          UserRole  @default(CLIENT)
 
   accounts     Account[]
-  appointments Appointment[]  @relation("ClientAppointments")
-  created      Appointment[]  @relation("AdminAppointments")
+  appointments Appointment[]   @relation("ClientAppointments")
+  created      Appointment[]   @relation("AdminAppointments")
   payments     Payment[]
-  pricing      ClientPricing?
-  createdAt    DateTime       @default(now())
+  pricing      ClientPricing[]
+  createdAt    DateTime        @default(now())
 
   sessionToken Session[]
 }
@@ -61,6 +68,7 @@ model Appointment {
   adminId       String
   paymentStatus PaymentStatus @default(PENDING)
   price         Decimal       @default(0.0)
+  pricingType   PricingType
   link          String? // Video call link
   status        SessionStatus @default(SCHEDULED)
   createdAt     DateTime      @default(now())
@@ -75,16 +83,33 @@ model Payment {
   paidAt     DateTime
   method     PaymentMethod
   package    Boolean       @default(false)
-  sessionIds String[] // Session IDs this payment covers
+  sessionIds String[] // Appointment IDs this payment covers
 }
 
 model ClientPricing {
   id           String   @id @default(cuid())
   client       User     @relation(fields: [clientId], references: [id])
-  clientId     String   @unique
+  clientId     String
   price        Decimal
   packagePrice Decimal?
+  packageSize  Int? // Number of sessions in the package
+  isActive     Boolean  @default(true)
+  validFrom    DateTime @default(now())
   createdAt    DateTime @default(now())
+
+  @@index([clientId, isActive])
+}
+
+model GlobalPricing {
+  id           String   @id @default(cuid())
+  name         String
+  singlePrice  Decimal
+  packagePrice Decimal?
+  packageSize  Int
+  durationDays Int // Duration in days for the package validity
+  validFrom    DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 // === NextAuth ===

@@ -26,16 +26,16 @@ async function SignInPage() {
   return (
     <Card className="w-[350px] max-w-md mx-auto shadow-olive bg-white border-olive-primary border-thin">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl text-center">Welcome</CardTitle>
+        <CardTitle className="text-2xl text-center">ВІТАЄМО!</CardTitle>
         <CardDescription className="text-center">
-          Access your therapy portal
+          Доступ до терамедичної системи
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="login">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+            <TabsTrigger value="login">Вхід</TabsTrigger>
+            <TabsTrigger value="register">Реєстрація</TabsTrigger>
           </TabsList>
 
           <TabsContent value="login">
