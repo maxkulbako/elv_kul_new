@@ -18,26 +18,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
-
-// Mock upcoming appointments data
-const upcomingAppointments = [
-  {
-    id: "1",
-    date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-    time: "10:00 AM",
-    duration: 50,
-    type: "Individual Therapy",
-    status: "confirmed",
-  },
-  {
-    id: "2",
-    date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
-    time: "2:30 PM",
-    duration: 50,
-    type: "Individual Therapy",
-    status: "confirmed",
-  },
-];
+import { getClientAppointments } from "@/lib/actions/appointment.action";
+import { format } from "date-fns";
 
 // Format date to display day of week and date
 const formatDate = (date: Date) => {
@@ -52,6 +34,12 @@ const ClientDashboardPage = async () => {
   await requireClientAuth();
   const session = await auth();
   const user = session?.user;
+
+  if (!user) throw new Error("User not found");
+
+  const upcomingAppointments = await getClientAppointments({
+    clientId: user?.id,
+  });
 
   return (
     <div className="flex-grow container py-8 mx-auto">
@@ -88,7 +76,8 @@ const ClientDashboardPage = async () => {
                 </p>
                 {upcomingAppointments.length > 0 && (
                   <p className="text-olive-primary">
-                    {upcomingAppointments[0].time}
+                    {/*  TODO: get duration from global pricing */}
+                    {upcomingAppointments[0].durationMin || 50} minutes
                   </p>
                 )}
               </div>
@@ -164,9 +153,12 @@ const ClientDashboardPage = async () => {
                           </span>
                         </div>
                         <div>
-                          <h4 className="font-medium">{appointment.type}</h4>
+                          {/* TODO: implement type in prisma schema */}
+                          {/* <h4 className="font-medium">{appointment.type}</h4> */}
+                          <h4 className="font-medium">Individual Therapy</h4>
                           <p className="text-sm text-muted-foreground">
-                            {appointment.time} • {appointment.duration} minutes
+                            {format(appointment.date, "h:mm a")} •{" "}
+                            {appointment.durationMin || 50} minutes
                           </p>
                         </div>
                       </div>

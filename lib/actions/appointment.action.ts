@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { Decimal } from "@prisma/client/runtime/library";
 import { combineDateAndTime } from "@/lib/utils";
+import { revalidatePath } from "next/cache";
 
 export async function scheduleAppointment(
   _prevState: unknown,
@@ -14,6 +15,7 @@ export async function scheduleAppointment(
   if (!session) throw new Error("Unauthorized");
   if (!formData.get("date")) throw new Error("Date is required");
 
+  // Format the date and time
   const finalDate = combineDateAndTime(
     formData.get("date") as string,
     formData.get("time") as string
@@ -44,7 +46,7 @@ export async function scheduleAppointment(
   // 4. Create the appointment
   await prisma.appointment.create({
     data: {
-      date: new Date(formData.get("date") as string),
+      date: new Date(finalDate),
       durationMin: 50,
       clientId: session.user.id,
       adminId: admin.id,
@@ -55,5 +57,28 @@ export async function scheduleAppointment(
     },
   });
 
+  // Revalidate the client dashboard page
+  revalidatePath("/client/dashboard");
+
   return { success: true, message: "Appointment scheduled successfully" };
+}
+
+export async function getClientAppointments({
+  clientId,
+}: {
+  clientId: string;
+}) {
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      clientId,
+      date: {
+        gte: new Date(),
+      },
+    },
+    orderBy: {
+      date: "asc",
+    },
+  });
+
+  return appointments;
 }

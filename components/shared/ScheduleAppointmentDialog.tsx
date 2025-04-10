@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { format, addDays } from "date-fns";
+import React, { useEffect, useState } from "react";
+import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Clock, CalendarIcon } from "lucide-react";
@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import { scheduleAppointment } from "@/lib/actions/appointment.action";
 import { useActionState } from "react";
+import router from "next/router";
 
 type ScheduleAppointmentDialogProps = {
   isOpen: boolean;
@@ -59,6 +60,12 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
     setDate(selectedDate);
   };
 
+  useEffect(() => {
+    if (state.success) {
+      onClose();
+    }
+  }, [state.success, isPending]);
+
   const handleSubmit = (formData: FormData) => {
     if (!date || !selectedTimeSlot) return;
 
@@ -66,7 +73,6 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
     formData.set("time", selectedTimeSlot);
 
     action(formData);
-    onClose();
   };
 
   return (
