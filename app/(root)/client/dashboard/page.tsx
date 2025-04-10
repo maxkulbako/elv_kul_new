@@ -8,27 +8,18 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { requireClientAuth } from "@/lib/auth/require-client";
-import {
-  CalendarPlus,
-  Calendar,
-  Clock,
-  CreditCard,
-  Video,
-  Link,
-  ChevronRight,
-} from "lucide-react";
+import { CalendarPlus, Calendar, CreditCard, Video } from "lucide-react";
 import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
-import { getClientAppointments } from "@/lib/actions/appointment.action";
-import { format } from "date-fns";
-
-// Format date to display day of week and date
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat("en-US", {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  }).format(date);
-};
+import { NextAppointmentCard } from "@/app/(root)/client/dashboard/NextAppontmentCard";
+import { TotalSessionsCard } from "@/app/(root)/client/dashboard/TotalSessionCard";
+import { PaymentDueCard } from "@/app/(root)/client/dashboard/PaymentDueCard";
+import { SessionPackageCard } from "@/app/(root)/client/dashboard/SessionPackageCard";
+import {
+  DashboardSkeletonCard,
+  UpcomingAppointmentsSkeleton,
+} from "@/app/(root)/client/dashboard/DashboardSkeletonCard";
+import { Suspense } from "react";
+import { UpcomingAppointments } from "@/app/(root)/client/dashboard/UpcomingAppointments";
 
 const ClientDashboardPage = async () => {
   await requireClientAuth();
@@ -36,10 +27,6 @@ const ClientDashboardPage = async () => {
   const user = session?.user;
 
   if (!user) throw new Error("User not found");
-
-  const upcomingAppointments = await getClientAppointments({
-    clientId: user?.id,
-  });
 
   return (
     <div className="flex-grow container py-8 mx-auto">
@@ -62,149 +49,27 @@ const ClientDashboardPage = async () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Next Appointment
-                </p>
-                <p className="text-2xl font-semibold">
-                  {upcomingAppointments.length > 0
-                    ? formatDate(upcomingAppointments[0].date)
-                    : "None scheduled"}
-                </p>
-                {upcomingAppointments.length > 0 && (
-                  <p className="text-olive-primary">
-                    {/*  TODO: get duration from global pricing */}
-                    {upcomingAppointments[0].durationMin || 50} minutes
-                  </p>
-                )}
-              </div>
-              <Calendar className="h-10 w-10 text-olive-primary" />
-            </div>
-          </CardContent>
-        </Card>
+        <Suspense fallback={<DashboardSkeletonCard />}>
+          <NextAppointmentCard />
+        </Suspense>
+        <Suspense fallback={<DashboardSkeletonCard />}>
+          <TotalSessionsCard />
+        </Suspense>
 
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Sessions</p>
-                <p className="text-2xl font-semibold">12</p>
-                <p className="text-olive-primary">View history</p>
-              </div>
-              <Clock className="h-10 w-10 text-olive-primary" />
-            </div>
-          </CardContent>
-        </Card>
+        <Suspense fallback={<DashboardSkeletonCard />}>
+          <PaymentDueCard />
+        </Suspense>
 
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Payment Due</p>
-                <p className="text-2xl font-semibold">$0.00</p>
-                <p className="text-olive-primary">All paid</p>
-              </div>
-              <CreditCard className="h-10 w-10 text-olive-primary" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Session Package</p>
-                <p className="text-2xl font-semibold">Standard</p>
-                <p className="text-olive-primary">Upgrade plan</p>
-              </div>
-              <Video className="h-10 w-10 text-olive-primary" />
-            </div>
-          </CardContent>
-        </Card>
+        <Suspense fallback={<DashboardSkeletonCard />}>
+          <SessionPackageCard />
+        </Suspense>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <Card className="bg-white">
-            <CardHeader>
-              <CardTitle>Upcoming Appointments</CardTitle>
-              <CardDescription>Your scheduled therapy sessions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {upcomingAppointments.length > 0 ? (
-                <div className="space-y-4">
-                  {upcomingAppointments.map((appointment) => (
-                    <div
-                      key={appointment.id}
-                      className="flex items-center justify-between p-4 bg-olive-light rounded-lg"
-                    >
-                      <div className="flex items-center">
-                        <div className="w-16 h-16 bg-olive-primary text-white rounded-lg flex flex-col items-center justify-center mr-4">
-                          <span className="text-sm font-medium">
-                            {new Intl.DateTimeFormat("en-US", {
-                              month: "short",
-                            }).format(appointment.date)}
-                          </span>
-                          <span className="text-2xl font-bold">
-                            {appointment.date.getDate()}
-                          </span>
-                        </div>
-                        <div>
-                          {/* TODO: implement type in prisma schema */}
-                          {/* <h4 className="font-medium">{appointment.type}</h4> */}
-                          <h4 className="font-medium">Individual Therapy</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {format(appointment.date, "h:mm a")} •{" "}
-                            {appointment.durationMin || 50} minutes
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-olive-primary text-olive-primary hover:bg-olive-primary hover:text-white"
-                        >
-                          Reschedule
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="bg-olive-primary hover:bg-olive-primary/90"
-                        >
-                          Join Session
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground mb-4">
-                    You have no upcoming appointments
-                  </p>
-                  <Button className="bg-olive-primary hover:bg-olive-primary/90">
-                    <CalendarPlus className="mr-2 h-4 w-4" />
-                    <ScheduleAppointmentClientWrapper>
-                      Schedule Now
-                    </ScheduleAppointmentClientWrapper>
-                  </Button>
-                </div>
-              )}
-
-              <div className="mt-4 text-right">
-                <Link
-                  to="/appointments"
-                  className="text-olive-primary hover:underline inline-flex items-center"
-                >
-                  View all appointments
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+          <Suspense fallback={<UpcomingAppointmentsSkeleton />}>
+            <UpcomingAppointments />
+          </Suspense>
         </div>
 
         <div>
