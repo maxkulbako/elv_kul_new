@@ -63,6 +63,26 @@ export async function scheduleAppointment(
   return { success: true, message: "Appointment scheduled successfully" };
 }
 
+export async function getCalendarAppointments() {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      clientId: session.user.id,
+    },
+    orderBy: {
+      date: "asc",
+    },
+  });
+
+  // Convert Decimal price to number
+  return appointments.map((appointment) => ({
+    ...appointment,
+    price: Number(appointment.price),
+  }));
+}
+
 export async function getClientAppointments() {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
@@ -76,6 +96,25 @@ export async function getClientAppointments() {
     },
     orderBy: {
       date: "asc",
+    },
+  });
+
+  return appointments;
+}
+
+export async function getPastAppointments() {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      clientId: session.user.id,
+      date: {
+        lt: new Date(),
+      },
+    },
+    orderBy: {
+      date: "desc",
     },
   });
 
