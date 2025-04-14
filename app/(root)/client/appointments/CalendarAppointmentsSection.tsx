@@ -10,7 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getCalendarAppointments } from "@/lib/actions/appointment.action";
+import {
+  cancelAppointment,
+  getCalendarAppointments,
+} from "@/lib/actions/appointment.action";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -22,6 +25,7 @@ import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppoin
 import { StatusBadge } from "./AppointmentsCard";
 import { cn } from "@/lib/utils";
 import { PaymentStatus, PricingType, SessionStatus } from "@prisma/client";
+import CancelAppointmentDialog from "@/components/shared/CancelAppointmentDialog";
 
 type Appointment = {
   id: string;
@@ -198,12 +202,16 @@ export const CalendarAppointmentsSection = () => {
                   </div>
                   {appointment.status === "SCHEDULED" && (
                     <div className="mt-4 flex gap-2 justify-end">
-                      <ScheduleAppointmentClientWrapper
-                        isRescheduling
-                        existingDate={appointment.date}
+                      <CancelAppointmentDialog
                         appointmentId={appointment.id}
                         onSuccess={refreshAppointments}
-                      >
+                        trigger={
+                          <Button variant="outline" size="sm">
+                            Cancel
+                          </Button>
+                        }
+                      />
+                      <ScheduleAppointmentClientWrapper>
                         <Button variant="outline" size="sm">
                           Reschedule
                         </Button>

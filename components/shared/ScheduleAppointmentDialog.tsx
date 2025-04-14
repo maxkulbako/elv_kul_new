@@ -21,7 +21,6 @@ import {
 import { cn } from "@/lib/utils";
 import { scheduleAppointment } from "@/lib/actions/appointment.action";
 import { useActionState } from "react";
-import { useRouter } from "next/navigation";
 
 type ScheduleAppointmentDialogProps = {
   isOpen: boolean;
@@ -54,8 +53,6 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(
     existingDate ? format(existingDate, "h:mm a") : ""
   );
-
-  const router = useRouter();
 
   const [state, action, isPending] = useActionState(scheduleAppointment, {
     success: false,

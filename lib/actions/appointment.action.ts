@@ -84,6 +84,24 @@ export async function scheduleAppointment(
   }
 }
 
+export async function cancelAppointment(
+  _prevState: unknown,
+  formData: FormData
+) {
+  const appointmentId = formData.get("appointmentId") as string;
+
+  await prisma.appointment.update({
+    where: { id: appointmentId },
+    data: { status: "CANCELLED" },
+  });
+
+  // Revalidate the client dashboard and appointments page
+  revalidatePath("/client/dashboard");
+  revalidatePath("/client/appointments");
+
+  return { success: true, message: "Appointment cancelled successfully" };
+}
+
 export async function getCalendarAppointments() {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
