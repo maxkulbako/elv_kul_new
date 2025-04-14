@@ -13,13 +13,26 @@ export async function scheduleAppointment(
   const session = await auth();
 
   if (!session) throw new Error("Unauthorized");
-  if (!formData.get("date")) throw new Error("Date is required");
+  if (!formData.get("date") || !formData.get("time"))
+    throw new Error("Date and time are required");
 
   // Format the date and time
   const finalDate = combineDateAndTime(
     formData.get("date") as string,
     formData.get("time") as string
   );
+
+  const appointmentId = formData.get("appointmentId") as string | null;
+
+  if (appointmentId) {
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        status: "RESCHEDULED",
+        updatedAt: new Date(),
+      },
+    });
+  }
 
   // 1. Fetch the global single pricing
   const globalPricing = await prisma.globalPricing.findFirst({
@@ -57,10 +70,18 @@ export async function scheduleAppointment(
     },
   });
 
-  // Revalidate the client dashboard page
+  // Revalidate the client dashboard and appointments page
   revalidatePath("/client/dashboard");
+  revalidatePath("/client/appointments");
 
-  return { success: true, message: "Appointment scheduled successfully" };
+  if (appointmentId) {
+    return {
+      success: true,
+      message: "Appointment rescheduled successfully",
+    };
+  } else {
+    return { success: true, message: "Appointment scheduled successfully" };
+  }
 }
 
 export async function getCalendarAppointments() {

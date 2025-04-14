@@ -21,13 +21,15 @@ import {
 import { cn } from "@/lib/utils";
 import { scheduleAppointment } from "@/lib/actions/appointment.action";
 import { useActionState } from "react";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 type ScheduleAppointmentDialogProps = {
   isOpen: boolean;
   onClose: () => void;
   isRescheduling?: boolean;
   existingDate?: Date;
+  appointmentId?: string;
+  onSuccess?: () => void;
 };
 
 const timeSlots = [
@@ -45,11 +47,15 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
   onClose,
   isRescheduling = false,
   existingDate,
+  appointmentId,
+  onSuccess,
 }) => {
   const [date, setDate] = useState<Date | undefined>(existingDate || undefined);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(
     existingDate ? format(existingDate, "h:mm a") : ""
   );
+
+  const router = useRouter();
 
   const [state, action, isPending] = useActionState(scheduleAppointment, {
     success: false,
@@ -63,11 +69,16 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
   useEffect(() => {
     if (state.success) {
       onClose();
+      onSuccess?.();
     }
   }, [state.success, isPending]);
 
   const handleSubmit = (formData: FormData) => {
     if (!date || !selectedTimeSlot) return;
+
+    if (appointmentId) {
+      formData.set("appointmentId", appointmentId);
+    }
 
     formData.set("date", date.toISOString());
     formData.set("time", selectedTimeSlot);

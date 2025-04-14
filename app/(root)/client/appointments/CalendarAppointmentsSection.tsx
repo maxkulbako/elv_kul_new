@@ -108,6 +108,15 @@ export const CalendarAppointmentsSection = () => {
     }
   };
 
+  const refreshAppointments = async () => {
+    try {
+      const data = await getCalendarAppointments();
+      setAppointments(data);
+    } catch (err) {
+      console.error("Failed to refresh appointments:", err);
+    }
+  };
+
   return (
     <Card className="bg-white">
       <CardHeader>
@@ -159,7 +168,7 @@ export const CalendarAppointmentsSection = () => {
             <h3 className="font-medium">
               Appointments for {format(selectedDate, "MMMM d, yyyy")}
             </h3>
-            <ScheduleAppointmentClientWrapper>
+            <ScheduleAppointmentClientWrapper onSuccess={refreshAppointments}>
               <Button
                 variant="outline"
                 className="border-olive-primary text-olive-primary"
@@ -189,7 +198,12 @@ export const CalendarAppointmentsSection = () => {
                   </div>
                   {appointment.status === "SCHEDULED" && (
                     <div className="mt-4 flex gap-2 justify-end">
-                      <ScheduleAppointmentClientWrapper>
+                      <ScheduleAppointmentClientWrapper
+                        isRescheduling
+                        existingDate={appointment.date}
+                        appointmentId={appointment.id}
+                        onSuccess={refreshAppointments}
+                      >
                         <Button variant="outline" size="sm">
                           Reschedule
                         </Button>
