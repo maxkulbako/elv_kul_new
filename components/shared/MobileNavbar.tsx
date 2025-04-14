@@ -37,6 +37,7 @@ const MobileNav = ({ session }: { session: any }) => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const user = session?.user;
+
   return (
     <div className="lg:hidden">
       <button className={burgerButtonStyles} onClick={toggleMenu}>
