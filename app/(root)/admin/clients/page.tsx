@@ -1,7 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -10,20 +9,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Search,
-  Plus,
-  User,
-  Trash,
-} from "lucide-react";
+import { Plus, User, Trash } from "lucide-react";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
 import { getAllClients } from "@/lib/actions/admin.acrion";
 import { format } from "date-fns";
+import SearchField from "./SearchField";
 
-const ClientsPage = async () => {
+const ClientsPage = async ({
+  searchParams,
+}: {
+  searchParams: { query?: string };
+}) => {
   await requireAdminAuth();
 
-  const clients = await getAllClients();
+  const resolvedSearchParams = await searchParams;
+
+  const query = resolvedSearchParams?.query || "";
+  const clients = await getAllClients(query);
 
   return (
     <div className="flex min-h-screen w-full">
@@ -43,14 +45,7 @@ const ClientsPage = async () => {
           </div>
 
           <div className="flex items-center w-full max-w-sm">
-            <div className="relative w-full">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search clients..."
-                className="pl-9"
-              />
-            </div>
+            <SearchField />
           </div>
 
           <div className="border rounded-md">
@@ -80,9 +75,8 @@ const ClientsPage = async () => {
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      <div>
-                        <div>{client.email}</div>
-                        {/* <div className="text-sm text-muted-foreground">{client.phone}</div> */}
+                      <div className="max-w-[200px]">
+                        <div className="truncate">{client.email}</div>
                       </div>
                     </TableCell>
                     {/* TODO: Add status */}

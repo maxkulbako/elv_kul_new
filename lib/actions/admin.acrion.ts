@@ -1,4 +1,5 @@
 "use server";
+
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -30,7 +31,7 @@ export async function getAdminAppointments() {
   return appointments;
 }
 
-export async function getAllClients() {
+export async function getAllClients(query: string = "") {
   const session = await auth();
   if (!session?.user || session.user.role !== "ADMIN")
     throw new Error("Unauthorized");
@@ -38,6 +39,10 @@ export async function getAllClients() {
   const clients = await prisma.user.findMany({
     where: {
       role: "CLIENT",
+      name: {
+        contains: query,
+        mode: "insensitive",
+      },
     },
     select: {
       id: true,
