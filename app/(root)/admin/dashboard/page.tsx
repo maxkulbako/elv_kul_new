@@ -31,6 +31,8 @@ import {
 import Link from "next/link";
 import { auth } from "@/auth";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
+import UpcomingSessionsSection from "./UpcomingSessionsSection";
+
 // Mock data for upcoming appointments
 const upcomingAppointments = [
   {
@@ -191,49 +193,7 @@ const AdminDashboardPage: React.FC = async () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>Upcoming Sessions</CardTitle>
-                  <CardDescription>
-                    Your scheduled appointments for today
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {upcomingAppointments.map((appointment) => (
-                      <div
-                        key={appointment.id}
-                        className="flex items-center justify-between p-4 bg-olive-light rounded-lg"
-                      >
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 bg-olive-primary text-white rounded-full flex items-center justify-center mr-4">
-                            {appointment.clientName.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <h4 className="font-medium">
-                              {appointment.clientName}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {formatTime(appointment.date)} •{" "}
-                              {appointment.duration} minutes •{" "}
-                              {appointment.type}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Link href={`/admin/clients/${appointment.id}`}>
-                            <User className="h-5 w-5 text-olive-primary mr-2 cursor-pointer" />
-                          </Link>
-                          <Link href={`/admin/sessions/${appointment.id}`}>
-                            <Video className="h-5 w-5 text-olive-primary cursor-pointer" />
-                          </Link>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
+              <UpcomingSessionsSection />
               <Card>
                 <CardHeader>
                   <CardTitle>Client Insights</CardTitle>
