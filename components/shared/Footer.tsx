@@ -16,7 +16,13 @@ const Footer = () => {
       <div className={containerStyles}>
         <div className="w-full flex flex-col items-center justify-center gap-[40px] xl:flex-row xl:justify-between">
           <div className="relative w-[44px] h-[44px] block xl:hidden">
-            <Image src={smallLogo} alt="logo" fill className="object-contain" />
+            <Image
+              src={smallLogo}
+              alt="logo"
+              fill
+              className="object-contain"
+              sizes="44px"
+            />
           </div>
           <div className="relative w-[120px] h-[120px] hidden xl:block">
             <Image src={logo} alt="logo" fill className="object-contain" />
