@@ -106,9 +106,9 @@ const clientsData = {
 const ClientDetailPage = async ({
   params,
 }: {
-  params: { clientID: string };
+  params: Promise<{ clientID: string }>;
 }) => {
-  const { clientID } = params;
+  const { clientID } = await params;
 
   // In a real app, you would fetch this data from an API
   // const client = clientID

@@ -18,14 +18,13 @@ import SearchField from "./SearchField";
 const ClientsPage = async ({
   searchParams,
 }: {
-  searchParams: { query?: string };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) => {
   await requireAdminAuth();
 
-  const resolvedSearchParams = await searchParams;
+  const query = (await searchParams).query;
 
-  const query = resolvedSearchParams?.query || "";
-  const clients = await getAllClients(query);
+  const clients = await getAllClients(query ? (query as string) : "");
 
   return (
     <div className="flex min-h-screen w-full">
