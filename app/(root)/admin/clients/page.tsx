@@ -104,7 +104,12 @@ const ClientsPage = async ({
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
-                        <Button variant="ghost" size="sm" asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          asChild
+                          className="hover:bg-olive-primary/90 hover:text-white"
+                        >
                           <Link href={`/admin/clients/${client.id}`}>
                             <User className="h-4 w-4" />
                             <span className="sr-only">View</span>
@@ -113,7 +118,7 @@ const ClientsPage = async ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="cursor-pointer"
+                          className="cursor-pointer hover:bg-olive-primary/90 hover:text-white"
                         >
                           <Trash className="h-4 w-4" />
                           <span className="sr-only">Delete</span>

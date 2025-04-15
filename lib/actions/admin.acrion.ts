@@ -91,3 +91,54 @@ export async function getAllClients(query: string = "") {
 
   return clients;
 }
+
+export const getClientById = async (id: string) => {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  const client = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      name: true,
+      email: true,
+      createdAt: true,
+      _count: {
+        select: {
+          appointments: true,
+        },
+      },
+      appointments: {
+        where: {
+          date: {
+            gte: new Date(),
+          },
+        },
+        orderBy: {
+          date: "asc",
+        },
+        select: {
+          id: true,
+          date: true,
+          durationMin: true,
+          status: true,
+        },
+      },
+      pricing: {
+        where: {
+          isActive: true,
+        },
+        select: {
+          price: true,
+          packagePrice: true,
+          packageSize: true,
+        },
+        take: 1,
+      },
+    },
+  });
+
+  return client;
+};

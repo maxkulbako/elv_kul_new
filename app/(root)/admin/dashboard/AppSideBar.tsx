@@ -29,8 +29,10 @@ const AppSideBar = async () => {
             {user?.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h3 className="font-medium">Dr. {user?.name}</h3>
-            <p className="text-xs text-muted-foreground">{user?.email}</p>
+            {/* <h3 className="font-medium">Dr. {user?.name}</h3> */}
+            <h3 className="font-medium">Dr. Alex Moore</h3>
+            {/* <p className="text-xs text-muted-foreground">{user?.email}</p> */}
+            <p className="text-xs text-muted-foreground">home@psy-elvida.com</p>
           </div>
         </div>
       </SidebarHeader>
