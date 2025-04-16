@@ -1,17 +1,41 @@
-"use client";
+import { cn } from "@/lib/utils";
 
-import { X, Menu } from "lucide-react";
-import { useState } from "react";
+const burgerButtonStyles = cn(
+  "w-[25px] h-[22px]",
+  "xl:hidden cursor-pointer z-100 relative"
+);
 
-const BurgerButton = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+const burgerLineStyles = (
+  isOpen: boolean,
+  position: "top" | "middle" | "bottom"
+) =>
+  cn(
+    "absolute left-0 w-full h-0.5 bg-white transition-all ease-in",
+    position === "top" && [
+      "top-0",
+      "duration-300",
+      isOpen && "rotate-45 translate-y-2",
+    ],
+    position === "middle" && ["top-1/2", isOpen && "opacity-0"],
+    position === "bottom" && [
+      "top-full",
+      "duration-300",
+      isOpen && "-translate-y-3.5 -rotate-45",
+    ]
+  );
 
+const BurgerButton = ({
+  isOpen,
+  toggleMenu,
+}: {
+  isOpen: boolean;
+  toggleMenu: () => void;
+}) => {
   return (
-    <button
-      className="md:hidden flex items-center text-olive-dark"
-      onClick={() => setIsMenuOpen(!isMenuOpen)}
-    >
-      {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+    <button className={burgerButtonStyles} onClick={toggleMenu}>
+      <span className={burgerLineStyles(isOpen, "top")} />
+      <span className={burgerLineStyles(isOpen, "middle")} />
+      <span className={burgerLineStyles(isOpen, "bottom")} />
     </button>
   );
 };

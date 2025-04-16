@@ -1,5 +1,4 @@
 import { Calendar, CreditCard, FileText, Settings, Users } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
