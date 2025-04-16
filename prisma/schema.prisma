@@ -47,6 +47,10 @@ model User {
   emailVerified DateTime?
   image         String?
   role          UserRole  @default(CLIENT)
+  birthDate     DateTime?
+  phone         String?
+  telegram      String?
+  profession    String?
 
   accounts     Account[]
   appointments Appointment[]   @relation("ClientAppointments")
@@ -71,6 +75,8 @@ model Appointment {
   pricingType   PricingType
   link          String? // Video call link
   status        SessionStatus @default(SCHEDULED)
+  notes         String?
+  files         String[] // Array of file URLs
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }

@@ -105,6 +105,10 @@ export const getClientById = async (id: string) => {
       name: true,
       email: true,
       createdAt: true,
+      phone: true,
+      telegram: true,
+      profession: true,
+      birthDate: true,
       _count: {
         select: {
           appointments: true,
