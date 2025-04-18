@@ -3,6 +3,9 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+import { TimeSlot } from "@/app/(root)/admin/calendar/AvailabilityManager";
+import { endOfDay, startOfDay } from "date-fns";
+
 export async function getAdminAppointments() {
   const session = await auth();
   if (!session?.user || session.user.role !== "ADMIN")
@@ -146,3 +149,138 @@ export const getClientById = async (id: string) => {
 
   return client;
 };
+
+export async function createOrUpdateAvailableSlots(
+  _prevState: any,
+  formData: FormData
+) {
+  const session = await auth();
+  const adminId = session?.user?.id;
+
+  if (!adminId) throw new Error("Unauthorized");
+
+  try {
+    // 1. Create arrays for adding and deleting
+    const datesToCreate: Date[] = [];
+    const datesToDelete: Date[] = [];
+
+    // 2. Process each slot
+    const timeSlots: TimeSlot[] = JSON.parse(
+      formData.get("timeSlots") as string
+    );
+    const date: string = formData.get("date") as string;
+
+    for (const slot of timeSlots) {
+      const [hours, minutes] = slot.time.split(":").map(Number);
+      const fullDate = new Date(date);
+      fullDate.setHours(hours, minutes || 0, 0, 0);
+
+      if (slot.available) {
+        datesToCreate.push(fullDate);
+      } else {
+        datesToDelete.push(fullDate);
+      }
+    }
+
+    // 3. Check existing records
+    const existingSlots = await prisma.availableSlot.findMany({
+      where: {
+        adminId,
+        date: { in: [...datesToCreate, ...datesToDelete] },
+      },
+      select: {
+        date: true,
+      },
+    });
+
+    const existingDates = new Set(
+      existingSlots.map((slot) => slot.date.getTime())
+    );
+
+    // 4. Check booked slots
+    const bookedSlots = await prisma.appointment.findMany({
+      where: {
+        adminId,
+        date: { in: [...datesToCreate, ...datesToDelete] },
+        status: {
+          notIn: ["CANCELLED", "MISSED", "RESCHEDULED"],
+        },
+      },
+      select: {
+        date: true,
+      },
+    });
+
+    const bookedDates = new Set(bookedSlots.map((slot) => slot.date.getTime()));
+
+    // 5. Filter dates
+    const datesToCreateFiltered = datesToCreate.filter(
+      (date) =>
+        !existingDates.has(date.getTime()) && !bookedDates.has(date.getTime())
+    );
+
+    const datesToDeleteFiltered = datesToDelete.filter(
+      (date) =>
+        existingDates.has(date.getTime()) && !bookedDates.has(date.getTime())
+    );
+
+    // 6. Perform operations in a transaction
+    await prisma.$transaction(async (tx) => {
+      if (datesToDeleteFiltered.length > 0) {
+        await tx.availableSlot.deleteMany({
+          where: {
+            adminId,
+            date: { in: datesToDeleteFiltered },
+          },
+        });
+      }
+
+      if (datesToCreateFiltered.length > 0) {
+        await tx.availableSlot.createMany({
+          data: datesToCreateFiltered.map((date) => ({
+            adminId,
+            date,
+            duration: 50,
+          })),
+          skipDuplicates: true,
+        });
+      }
+    });
+
+    return {
+      success: true,
+      message: "Available slots updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Failed to update available slots",
+    };
+  }
+}
+
+export async function getAvailableSlotsByDate(date: Date) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const slots = await prisma.availableSlot.findMany({
+    where: {
+      adminId: session.user.id,
+      date: {
+        gte: startOfDay(date),
+        lte: endOfDay(date),
+      },
+    },
+    select: {
+      date: true,
+    },
+  });
+
+  return slots.map((slot) => {
+    const h = slot.date.getHours();
+    const m = slot.date.getMinutes();
+    return {
+      time: `${h}:${m === 0 ? "00" : m}`,
+    };
+  });
+}

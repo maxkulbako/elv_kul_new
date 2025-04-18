@@ -6,13 +6,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, isSameDay } from "date-fns";
-import {
-  Calendar as CalendarIcon,
-  Video,
-  User,
-  ArrowRight,
-  Clock,
-} from "lucide-react";
+import { Calendar as CalendarIcon, Video, User } from "lucide-react";
+import { AvailabilityManager } from "./AvailabilityManager";
 
 // Mock session data
 const sessionData = [
@@ -90,11 +85,16 @@ const AdminCalendarPage: React.FC = () => {
     <div className="flex min-h-screen w-full">
       <div className="flex-1 p-6">
         <div className="flex flex-col space-y-6">
-          <div>
-            <h1 className="text-2xl font-semibold">Calendar</h1>
-            <p className="text-muted-foreground">
-              Manage your appointments and schedule
-            </p>
+          <div className="flex justify-between flex-wrap">
+            <div>
+              <h1 className="text-2xl font-semibold">Calendar</h1>
+              <p className="text-muted-foreground">
+                Manage your appointments and schedule
+              </p>
+            </div>
+            <div>
+              <AvailabilityManager />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

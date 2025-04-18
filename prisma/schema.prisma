@@ -52,33 +52,49 @@ model User {
   telegram      String?
   profession    String?
 
-  accounts     Account[]
-  appointments Appointment[]   @relation("ClientAppointments")
-  created      Appointment[]   @relation("AdminAppointments")
-  payments     Payment[]
-  pricing      ClientPricing[]
-  createdAt    DateTime        @default(now())
-
-  sessionToken Session[]
+  accounts       Account[]
+  appointments   Appointment[]   @relation("ClientAppointments")
+  created        Appointment[]   @relation("AdminAppointments")
+  payments       Payment[]
+  pricing        ClientPricing[]
+  createdAt      DateTime        @default(now())
+  availableSlots AvailableSlot[]
+  sessionToken   Session[]
 }
 
 model Appointment {
-  id            String        @id @default(cuid())
-  date          DateTime
-  durationMin   Int
-  client        User          @relation("ClientAppointments", fields: [clientId], references: [id])
-  clientId      String
-  admin         User          @relation("AdminAppointments", fields: [adminId], references: [id])
-  adminId       String
-  paymentStatus PaymentStatus @default(PENDING)
-  price         Decimal       @default(0.0)
-  pricingType   PricingType
-  link          String? // Video call link
-  status        SessionStatus @default(SCHEDULED)
-  notes         String?
-  files         String[] // Array of file URLs
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id              String          @id @default(cuid())
+  date            DateTime
+  durationMin     Int
+  client          User            @relation("ClientAppointments", fields: [clientId], references: [id])
+  clientId        String
+  admin           User            @relation("AdminAppointments", fields: [adminId], references: [id])
+  adminId         String
+  paymentStatus   PaymentStatus   @default(PENDING)
+  price           Decimal         @default(0.0)
+  pricingType     PricingType
+  link            String? // Video call link
+  status          SessionStatus   @default(SCHEDULED)
+  notes           String?
+  files           String[] // Array of file URLs
+  availableSlotId AvailableSlot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AvailableSlot {
+  id        String   @id @default(cuid())
+  admin     User     @relation(fields: [adminId], references: [id])
+  adminId   String
+  date      DateTime
+  duration  Int      @default(50) // за замовчуванням 50 хв
+  isBooked  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  appointmentId String?
 }
 
 model Payment {
