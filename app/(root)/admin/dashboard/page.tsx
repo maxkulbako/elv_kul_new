@@ -6,29 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Calendar,
-  Users,
-  Clock,
-  CreditCard,
-  Video,
-  FileText,
-  Settings,
-  User,
-} from "lucide-react";
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarHeader,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-} from "@/components/ui/sidebar";
-import Link from "next/link";
+import { Users, Clock, CreditCard, Video } from "lucide-react";
 import { auth } from "@/auth";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
 import UpcomingSessionsSection from "./UpcomingSessionsSection";

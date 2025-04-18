@@ -39,7 +39,8 @@ function Calendar({
         ),
         day_selected:
           "bg-olive-primary text-white hover:bg-olive-primary hover:text-white focus:bg-olive-primary focus:text-white",
-        day_today: "bg-olive-primary/10 text-olive-primary",
+        day_today:
+          "bg-olive-primary/10 text-olive-primary border-2 border-olive-primary",
         day_outside: "text-muted-foreground opacity-50",
         day_disabled: "text-muted-foreground opacity-50",
         day_range_middle:

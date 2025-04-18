@@ -6,22 +6,38 @@ import { prisma } from "@/lib/prisma";
 import { TimeSlot } from "@/app/(root)/admin/calendar/AvailabilityManager";
 import { endOfDay, startOfDay } from "date-fns";
 
-export async function getAdminAppointments() {
+export async function getAdminAppointments(
+  take?: number,
+  year?: number,
+  month?: number
+) {
   const session = await auth();
   if (!session?.user || session.user.role !== "ADMIN")
     throw new Error("Unauthorized");
+
+  const today = new Date();
+  const startDate =
+    year !== undefined && month !== undefined
+      ? new Date(year, month, 1)
+      : new Date(today.getFullYear(), today.getMonth(), 1);
+
+  const endDate =
+    year !== undefined && month !== undefined
+      ? new Date(year, month + 1, 0)
+      : new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
   const appointments = await prisma.appointment.findMany({
     where: {
       adminId: session.user.id,
       date: {
-        gte: new Date(),
+        gte: startDate,
+        lte: endDate,
       },
     },
     orderBy: {
       date: "asc",
     },
-    take: 5,
+    take: take,
     include: {
       client: {
         select: {
@@ -31,7 +47,11 @@ export async function getAdminAppointments() {
     },
   });
 
-  return appointments;
+  // Convert Decimal to number for serialization
+  return appointments.map((appointment) => ({
+    ...appointment,
+    price: appointment.price ? Number(appointment.price) : null,
+  }));
 }
 
 export async function getAllClients(query: string = "") {
@@ -283,4 +303,69 @@ export async function getAvailableSlotsByDate(date: Date) {
       time: `${h}:${m === 0 ? "00" : m}`,
     };
   });
+}
+
+export async function getAdminAppointmentsDates(year: number, month: number) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  const startDate = new Date(year, month, 1);
+  const endDate = new Date(year, month + 1, 0);
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      adminId: session.user.id,
+      date: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    select: {
+      date: true,
+    },
+    distinct: ["date"],
+  });
+
+  return appointments.map((appointment) => appointment.date);
+}
+
+export async function getAdminAppointmentsByDate(date: Date) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  const startOfDay = new Date(date);
+  startOfDay.setHours(0, 0, 0, 0);
+
+  const endOfDay = new Date(date);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      adminId: session.user.id,
+      date: {
+        gte: startOfDay,
+        lte: endOfDay,
+      },
+    },
+    select: {
+      id: true,
+      date: true,
+      durationMin: true,
+      status: true,
+      clientId: true,
+      client: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+
+  return appointments.map((appointment) => ({
+    ...appointment,
+    clientName: appointment.client.name || "Unknown Client",
+    type: "Individual Therapy", //TODO: add type to appointment model
+  }));
 }
