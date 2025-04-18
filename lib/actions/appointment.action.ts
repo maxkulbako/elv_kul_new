@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { Decimal } from "@prisma/client/runtime/library";
 import { combineDateAndTime } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { format, startOfDay, endOfDay } from "date-fns";
 
 export async function scheduleAppointment(
   _prevState: unknown,
@@ -16,71 +17,101 @@ export async function scheduleAppointment(
   if (!formData.get("date") || !formData.get("time"))
     throw new Error("Date and time are required");
 
-  // Format the date and time
-  const finalDate = combineDateAndTime(
-    formData.get("date") as string,
-    formData.get("time") as string
-  );
+  try {
+    // Format the date and time
+    const finalDate = combineDateAndTime(
+      formData.get("date") as string,
+      formData.get("time") as string
+    );
 
-  const appointmentId = formData.get("appointmentId") as string | null;
+    const appointmentId = formData.get("appointmentId") as string | null;
 
-  if (appointmentId) {
-    await prisma.appointment.update({
-      where: { id: appointmentId },
-      data: {
-        status: "RESCHEDULED",
-        updatedAt: new Date(),
+    if (appointmentId) {
+      await prisma.appointment.update({
+        where: { id: appointmentId },
+        data: {
+          status: "RESCHEDULED",
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    // 1. Fetch the global single pricing
+    const globalPricing = await prisma.globalPricing.findFirst({
+      orderBy: { validFrom: "desc" }, // most recent
+    });
+
+    // 2. Define the final price
+    const DEFAULT_PRICE = new Decimal(50); // TODO: get from global pricing
+
+    const finalPrice =
+      globalPricing?.singlePrice && globalPricing.singlePrice.gt(0)
+        ? globalPricing.singlePrice
+        : DEFAULT_PRICE;
+
+    const pricingType = "GLOBAL_SINGLE";
+
+    // 3. Get admin user (since we only have one admin)
+    const admin = await prisma.user.findFirst({
+      where: { role: "ADMIN" },
+    });
+
+    if (!admin) throw new Error("Admin not found");
+
+    // 4. Find available slot
+    const availableSlot = await prisma.availableSlot.findFirst({
+      where: {
+        date: new Date(finalDate),
+        adminId: admin.id,
+        appointmentId: null, // must not be already booked
       },
     });
-  }
 
-  // 1. Fetch the global single pricing
-  const globalPricing = await prisma.globalPricing.findFirst({
-    orderBy: { validFrom: "desc" }, // most recent
-  });
+    if (!availableSlot) {
+      return {
+        success: false,
+        message: "This time slot is no longer available.",
+      };
+    }
 
-  // 2. Define the final price
-  const DEFAULT_PRICE = new Decimal(50); // TODO: get from global pricing
+    // 5. Create the appointment
+    const appointment = await prisma.appointment.create({
+      data: {
+        date: new Date(finalDate),
+        durationMin: 50,
+        clientId: session.user.id,
+        adminId: admin.id,
+        price: finalPrice,
+        paymentStatus: "PENDING",
+        status: "SCHEDULED",
+        pricingType,
+      },
+    });
 
-  const finalPrice =
-    globalPricing?.singlePrice && globalPricing.singlePrice.gt(0)
-      ? globalPricing.singlePrice
-      : DEFAULT_PRICE;
+    // 5.Link the slot
+    await prisma.availableSlot.update({
+      where: { id: availableSlot.id },
+      data: {
+        appointmentId: appointment.id,
+      },
+    });
 
-  const pricingType = "GLOBAL_SINGLE";
+    // Revalidate the client dashboard and appointments page
+    revalidatePath("/client/dashboard");
+    revalidatePath("/client/appointments");
 
-  // 3. Get admin user (since we only have one admin)
-  const admin = await prisma.user.findFirst({
-    where: { role: "ADMIN" },
-  });
-
-  if (!admin) throw new Error("Admin not found");
-
-  // 4. Create the appointment
-  await prisma.appointment.create({
-    data: {
-      date: new Date(finalDate),
-      durationMin: 50,
-      clientId: session.user.id,
-      adminId: admin.id,
-      price: finalPrice,
-      paymentStatus: "PENDING",
-      status: "SCHEDULED",
-      pricingType,
-    },
-  });
-
-  // Revalidate the client dashboard and appointments page
-  revalidatePath("/client/dashboard");
-  revalidatePath("/client/appointments");
-
-  if (appointmentId) {
     return {
       success: true,
-      message: "Appointment rescheduled successfully",
+      message: appointmentId
+        ? "Appointment rescheduled successfully"
+        : "Appointment scheduled successfully",
     };
-  } else {
-    return { success: true, message: "Appointment scheduled successfully" };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Error scheduling appointment",
+    };
   }
 }
 
@@ -90,16 +121,48 @@ export async function cancelAppointment(
 ) {
   const appointmentId = formData.get("appointmentId") as string;
 
-  await prisma.appointment.update({
-    where: { id: appointmentId },
-    data: { status: "CANCELLED" },
-  });
+  try {
+    // Find the appointment and include related availableSlot
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+      include: {
+        availableSlot: true,
+      },
+    });
 
-  // Revalidate the client dashboard and appointments page
-  revalidatePath("/client/dashboard");
-  revalidatePath("/client/appointments");
+    if (!appointment) {
+      return {
+        success: false,
+        message: "Appointment not found",
+      };
+    }
 
-  return { success: true, message: "Appointment cancelled successfully" };
+    // Update the appointment status
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: "CANCELLED" },
+    });
+
+    // If there's a linked availableSlot, unlink it
+    if (appointment.availableSlot) {
+      await prisma.availableSlot.update({
+        where: { id: appointment.availableSlot.id },
+        data: { appointmentId: null },
+      });
+    }
+
+    // Revalidate UI
+    revalidatePath("/client/dashboard");
+    revalidatePath("/client/appointments");
+
+    return { success: true, message: "Appointment cancelled successfully" };
+  } catch (error) {
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : "Error cancelling appointment",
+    };
+  }
 }
 
 export async function getCalendarAppointments() {
@@ -225,4 +288,24 @@ export async function getCurrentSessionPackage() {
   });
 
   return activePackage;
+}
+
+export async function getAvailableSlots(date: Date) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Unauthorized");
+
+  const timeSlots = await prisma.availableSlot.findMany({
+    where: {
+      date: {
+        gte: startOfDay(date),
+        lte: endOfDay(date),
+      },
+      appointmentId: null,
+    },
+  });
+
+  console.log(timeSlots);
+  const availableSlots = timeSlots.map((slot) => format(slot.date, "h:mm a"));
+
+  return availableSlots;
 }

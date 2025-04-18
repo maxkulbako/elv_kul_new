@@ -1,12 +1,12 @@
-import { getAdminAppointmentsDates } from "@/lib/actions/admin.acrion";
 import CalendarView from "./CalendarView";
+import { getAdminAppointmentsDates } from "@/lib/actions/admin.acrion";
 
-export default async function AdminCalendarPage() {
+export default async function CalendarPage() {
   const today = new Date();
-  const dates = await getAdminAppointmentsDates(
+  const initialDates = await getAdminAppointmentsDates(
     today.getFullYear(),
     today.getMonth()
   );
 
-  return <CalendarView initialDates={dates} />;
+  return <CalendarView initialDates={initialDates} />;
 }

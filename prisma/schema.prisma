@@ -63,21 +63,23 @@ model User {
 }
 
 model Appointment {
-  id              String          @id @default(cuid())
-  date            DateTime
-  durationMin     Int
-  client          User            @relation("ClientAppointments", fields: [clientId], references: [id])
-  clientId        String
-  admin           User            @relation("AdminAppointments", fields: [adminId], references: [id])
-  adminId         String
-  paymentStatus   PaymentStatus   @default(PENDING)
-  price           Decimal         @default(0.0)
-  pricingType     PricingType
-  link            String? // Video call link
-  status          SessionStatus   @default(SCHEDULED)
-  notes           String?
-  files           String[] // Array of file URLs
-  availableSlotId AvailableSlot[]
+  id            String        @id @default(cuid())
+  date          DateTime
+  durationMin   Int
+  client        User          @relation("ClientAppointments", fields: [clientId], references: [id])
+  clientId      String
+  admin         User          @relation("AdminAppointments", fields: [adminId], references: [id])
+  adminId       String
+  paymentStatus PaymentStatus @default(PENDING)
+  price         Decimal       @default(0.0)
+  pricingType   PricingType
+  link          String? // Video call link
+  status        SessionStatus @default(SCHEDULED)
+  notes         String?
+  files         String[] // Array of file URLs
+
+  availableSlot   AvailableSlot? @relation(fields: [availableSlotId], references: [id])
+  availableSlotId String?        @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -89,12 +91,11 @@ model AvailableSlot {
   adminId   String
   date      DateTime
   duration  Int      @default(50) // за замовчуванням 50 хв
-  isBooked  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
-  appointmentId String?
+  appointment   Appointment? @relation
+  appointmentId String?      @unique
 }
 
 model Payment {

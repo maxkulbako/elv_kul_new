@@ -19,8 +19,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { scheduleAppointment } from "@/lib/actions/appointment.action";
+import {
+  getAvailableSlots,
+  scheduleAppointment,
+} from "@/lib/actions/appointment.action";
 import { useActionState } from "react";
+import { toast } from "sonner";
 
 type ScheduleAppointmentDialogProps = {
   isOpen: boolean;
@@ -31,16 +35,6 @@ type ScheduleAppointmentDialogProps = {
   onSuccess?: () => void;
 };
 
-const timeSlots = [
-  "9:00 AM",
-  "10:00 AM",
-  "11:00 AM",
-  "1:00 PM",
-  "2:00 PM",
-  "3:00 PM",
-  "4:00 PM",
-];
-
 const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
   isOpen,
   onClose,
@@ -50,28 +44,44 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
   onSuccess,
 }) => {
   const [date, setDate] = useState<Date | undefined>(existingDate || undefined);
+  const [timeSlots, setTimeSlots] = useState<string[]>([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(
     existingDate ? format(existingDate, "h:mm a") : ""
   );
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const [state, action, isPending] = useActionState(scheduleAppointment, {
     success: false,
     message: "",
   });
 
-  const handleDateSelect = (selectedDate: Date | undefined) => {
+  const handleDateSelect = async (selectedDate: Date | undefined) => {
     setDate(selectedDate);
+    setIsPopoverOpen(false);
+    if (selectedDate) {
+      const availableSlots = await getAvailableSlots(selectedDate);
+      setTimeSlots(availableSlots);
+    }
   };
 
   useEffect(() => {
     if (state.success) {
+      toast.success(state.message);
       onClose();
       onSuccess?.();
+      setDate(undefined);
+      setSelectedTimeSlot("");
+      setTimeSlots([]);
+    } else if (state.message) {
+      toast.error(state.message);
     }
-  }, [state.success, isPending]);
+  }, [state]);
 
-  const handleSubmit = (formData: FormData) => {
-    if (!date || !selectedTimeSlot) return;
+  const handleSubmit = async (formData: FormData) => {
+    if (!date || !selectedTimeSlot) {
+      toast.error("Please select both date and time");
+      return;
+    }
 
     if (appointmentId) {
       formData.set("appointmentId", appointmentId);
@@ -100,7 +110,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
         <form action={handleSubmit} className="flex flex-col gap-4">
           <div className="grid gap-2">
             <label className="text-sm font-medium">Date</label>
-            <Popover>
+            <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant={"outline"}
@@ -137,24 +147,30 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
 
           <div className="grid gap-2">
             <label className="text-sm font-medium">Time Slot</label>
-            <div className="grid grid-cols-3 gap-2">
-              {timeSlots.map((time) => (
-                <Button
-                  key={time}
-                  variant={selectedTimeSlot === time ? "default" : "outline"}
-                  className={cn(
-                    selectedTimeSlot === time
-                      ? "bg-olive-primary text-white"
-                      : "border-olive-primary text-olive-primary"
-                  )}
-                  onClick={() => setSelectedTimeSlot(time)}
-                  type="button"
-                >
-                  <Clock className="mr-1 h-3 w-3" />
-                  {time}
-                </Button>
-              ))}
-            </div>
+            {timeSlots.length > 0 ? (
+              <div className="grid grid-cols-3 gap-2">
+                {timeSlots.map((time) => (
+                  <Button
+                    key={time}
+                    variant={selectedTimeSlot === time ? "default" : "outline"}
+                    className={cn(
+                      selectedTimeSlot === time
+                        ? "bg-olive-primary text-white"
+                        : "border-olive-primary text-olive-primary"
+                    )}
+                    onClick={() => setSelectedTimeSlot(time)}
+                    type="button"
+                  >
+                    <Clock className="mr-1 h-3 w-3" />
+                    {time}
+                  </Button>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                No available slots for this date
+              </p>
+            )}
           </div>
 
           <DialogFooter>
