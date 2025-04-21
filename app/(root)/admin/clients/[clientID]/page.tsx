@@ -19,6 +19,7 @@ import ProfileTab from "./ProfileTab";
 import SessionNotesTab from "./SessionNotesTab";
 import AppointmentsTab from "./AppointmentsTab";
 import BilingTab from "./BilingTab";
+import { requireAdminAuth } from "@/lib/auth/require-admin";
 
 export type Client = Awaited<ReturnType<typeof getClientById>>;
 
@@ -27,6 +28,8 @@ const ClientDetailPage = async ({
 }: {
   params: Promise<{ clientID: string }>;
 }) => {
+  await requireAdminAuth();
+
   const { clientID } = await params;
 
   const client = await getClientById(clientID);

@@ -320,6 +320,7 @@ export async function getAdminAppointmentsDates(year: number, month: number) {
         gte: startDate,
         lte: endDate,
       },
+      status: "SCHEDULED",
     },
     select: {
       date: true,
@@ -348,6 +349,7 @@ export async function getAdminAppointmentsByDate(date: Date) {
         gte: startOfDay,
         lte: endOfDay,
       },
+      status: "SCHEDULED",
     },
     select: {
       id: true,

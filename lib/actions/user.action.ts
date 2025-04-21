@@ -3,6 +3,7 @@
 import { signIn, signOut } from "@/auth";
 import { signInFormSchema } from "../validations";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
+import { redirect } from "next/navigation";
 
 // sign in user with credentials
 export const signInWithCredentials = async (
@@ -29,5 +30,5 @@ export const signInWithCredentials = async (
 
 // sign out user
 export const signOutUser = async () => {
-  await signOut();
+  await signOut({ redirectTo: "/" });
 };
