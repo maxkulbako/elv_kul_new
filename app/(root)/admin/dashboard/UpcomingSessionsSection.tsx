@@ -12,7 +12,7 @@ import { format } from "date-fns";
 
 const UpcomingSessionsSection = async () => {
   const upcomingAppointments = await getAdminAppointments(5);
-
+  //TODO add only upcoming appointments
   return (
     <Card className="lg:col-span-2">
       <CardHeader>

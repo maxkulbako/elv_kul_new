@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CredentialsSignInForm from "./sign-in-form";
+import CredentialsSignUpForm from "./sign-up-form";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -19,7 +20,9 @@ export const metadata: Metadata = {
 async function SignInPage() {
   const session = await auth();
 
-  if (session) {
+  if (session?.user?.role === "ADMIN") {
+    redirect("/admin/dashboard");
+  } else if (session?.user?.role === "CLIENT") {
     redirect("/client/dashboard");
   }
 
@@ -28,7 +31,7 @@ async function SignInPage() {
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl text-center">ВІТАЄМО!</CardTitle>
         <CardDescription className="text-center">
-          Доступ до терамедичної системи
+          Доступ до терапевтичної системи
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -42,7 +45,9 @@ async function SignInPage() {
             <CredentialsSignInForm />
           </TabsContent>
 
-          <TabsContent value="register">REGISTER</TabsContent>
+          <TabsContent value="register">
+            <CredentialsSignUpForm />
+          </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
