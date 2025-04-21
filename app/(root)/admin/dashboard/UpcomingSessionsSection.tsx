@@ -5,7 +5,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { getAdminAppointments } from "@/lib/actions/admin.acrion";
+import { getAdminAppointments } from "@/lib/actions/admin.action";
 import { User, Video } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";

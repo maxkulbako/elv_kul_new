@@ -1,5 +1,5 @@
 import CalendarView from "./CalendarView";
-import { getAdminAppointmentsDates } from "@/lib/actions/admin.acrion";
+import { getAdminAppointmentsDates } from "@/lib/actions/admin.action";
 
 export default async function CalendarPage() {
   const today = new Date();

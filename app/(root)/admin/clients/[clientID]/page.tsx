@@ -14,7 +14,7 @@ import {
 import { Calendar, ArrowLeft, Phone, Mail, Video } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { getClientById } from "@/lib/actions/admin.acrion";
+import { getClientById } from "@/lib/actions/admin.action";
 import ProfileTab from "./ProfileTab";
 import SessionNotesTab from "./SessionNotesTab";
 import AppointmentsTab from "./AppointmentsTab";

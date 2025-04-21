@@ -10,10 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  cancelAppointment,
-  getCalendarAppointments,
-} from "@/lib/actions/appointment.action";
+import { getCalendarAppointments } from "@/lib/actions/appointment.action";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -211,7 +208,11 @@ export const CalendarAppointmentsSection = () => {
                           </Button>
                         }
                       />
-                      <ScheduleAppointmentClientWrapper>
+                      <ScheduleAppointmentClientWrapper
+                        isRescheduling={true}
+                        appointmentId={appointment.id}
+                        onSuccess={refreshAppointments}
+                      >
                         <Button variant="outline" size="sm">
                           Reschedule
                         </Button>

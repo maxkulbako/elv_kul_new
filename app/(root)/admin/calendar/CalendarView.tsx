@@ -11,7 +11,7 @@ import { AvailabilityManager } from "./AvailabilityManager";
 import {
   getAdminAppointmentsDates,
   getAdminAppointmentsByDate,
-} from "@/lib/actions/admin.acrion";
+} from "@/lib/actions/admin.action";
 import { SessionStatus } from "@prisma/client";
 
 interface Session {

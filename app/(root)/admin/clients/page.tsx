@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, User, Trash } from "lucide-react";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
-import { getAllClients } from "@/lib/actions/admin.acrion";
+import { getAllClients } from "@/lib/actions/admin.action";
 import { format } from "date-fns";
 import SearchField from "./SearchField";
 

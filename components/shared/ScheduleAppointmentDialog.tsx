@@ -30,24 +30,27 @@ type ScheduleAppointmentDialogProps = {
   isOpen: boolean;
   onClose: () => void;
   isRescheduling?: boolean;
-  existingDate?: Date;
   appointmentId?: string;
   onSuccess?: () => void;
+};
+
+type TimeSlot = {
+  timeSlotId: string;
+  time: string;
 };
 
 const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
   isOpen,
   onClose,
   isRescheduling = false,
-  existingDate,
   appointmentId,
   onSuccess,
 }) => {
-  const [date, setDate] = useState<Date | undefined>(existingDate || undefined);
-  const [timeSlots, setTimeSlots] = useState<string[]>([]);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>(
-    existingDate ? format(existingDate, "h:mm a") : ""
-  );
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<
+    TimeSlot | undefined
+  >(undefined);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const [state, action, isPending] = useActionState(scheduleAppointment, {
@@ -66,14 +69,18 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
 
   useEffect(() => {
     if (state.success) {
-      toast.success(state.message);
+      toast.success(state.message, {
+        richColors: true,
+      });
       onClose();
       onSuccess?.();
       setDate(undefined);
-      setSelectedTimeSlot("");
+      setSelectedTimeSlot(undefined);
       setTimeSlots([]);
     } else if (state.message) {
-      toast.error(state.message);
+      toast.error(state.message, {
+        richColors: true,
+      });
     }
   }, [state]);
 
@@ -88,7 +95,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
     }
 
     formData.set("date", date.toISOString());
-    formData.set("time", selectedTimeSlot);
+    formData.set("timeSlotId", selectedTimeSlot?.timeSlotId || "");
 
     action(formData);
   };
@@ -151,10 +158,14 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
               <div className="grid grid-cols-3 gap-2">
                 {timeSlots.map((time) => (
                   <Button
-                    key={time}
-                    variant={selectedTimeSlot === time ? "default" : "outline"}
+                    key={time.timeSlotId}
+                    variant={
+                      selectedTimeSlot?.timeSlotId === time.timeSlotId
+                        ? "default"
+                        : "outline"
+                    }
                     className={cn(
-                      selectedTimeSlot === time
+                      selectedTimeSlot?.timeSlotId === time.timeSlotId
                         ? "bg-olive-primary text-white"
                         : "border-olive-primary text-olive-primary"
                     )}
@@ -162,7 +173,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
                     type="button"
                   >
                     <Clock className="mr-1 h-3 w-3" />
-                    {time}
+                    {time.time}
                   </Button>
                 ))}
               </div>

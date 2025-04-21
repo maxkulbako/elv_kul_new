@@ -223,7 +223,7 @@ export async function createOrUpdateAvailableSlots(
         adminId,
         date: { in: [...datesToCreate, ...datesToDelete] },
         status: {
-          notIn: ["CANCELLED", "MISSED", "RESCHEDULED"],
+          in: ["SCHEDULED"],
         },
       },
       select: {

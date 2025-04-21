@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label";
 import {
   createOrUpdateAvailableSlots,
   getAvailableSlotsByDate,
-} from "@/lib/actions/admin.acrion";
+} from "@/lib/actions/admin.action";
 import { toast } from "sonner";
 
 export interface TimeSlot {

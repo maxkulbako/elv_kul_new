@@ -14,25 +14,28 @@ export async function scheduleAppointment(
   const session = await auth();
 
   if (!session) throw new Error("Unauthorized");
-  if (!formData.get("date") || !formData.get("time"))
-    throw new Error("Date and time are required");
+  if (!formData.get("date") || !formData.get("timeSlotId"))
+    return {
+      success: false,
+      message: "Date and time slot are required",
+    };
 
   try {
-    // Format the date and time
-    const finalDate = combineDateAndTime(
-      formData.get("date") as string,
-      formData.get("time") as string
-    );
-
     const appointmentId = formData.get("appointmentId") as string | null;
 
+    // If the appointment is being rescheduled, update the status
     if (appointmentId) {
       await prisma.appointment.update({
         where: { id: appointmentId },
         data: {
           status: "RESCHEDULED",
+          availableSlotId: null,
           updatedAt: new Date(),
         },
+      });
+      await prisma.availableSlot.update({
+        where: { appointmentId: appointmentId },
+        data: { appointmentId: null },
       });
     }
 
@@ -60,11 +63,7 @@ export async function scheduleAppointment(
 
     // 4. Find available slot
     const availableSlot = await prisma.availableSlot.findFirst({
-      where: {
-        date: new Date(finalDate),
-        adminId: admin.id,
-        appointmentId: null, // must not be already booked
-      },
+      where: { id: formData.get("timeSlotId") as string },
     });
 
     if (!availableSlot) {
@@ -77,13 +76,14 @@ export async function scheduleAppointment(
     // 5. Create the appointment
     const appointment = await prisma.appointment.create({
       data: {
-        date: new Date(finalDate),
+        date: availableSlot.date,
         durationMin: 50,
         clientId: session.user.id,
         adminId: admin.id,
         price: finalPrice,
         paymentStatus: "PENDING",
         status: "SCHEDULED",
+        availableSlotId: availableSlot.id,
         pricingType,
       },
     });
@@ -109,8 +109,7 @@ export async function scheduleAppointment(
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Error scheduling appointment",
+      message: "Error scheduling appointment",
     };
   }
 }
@@ -137,30 +136,31 @@ export async function cancelAppointment(
       };
     }
 
-    // Update the appointment status
-    await prisma.appointment.update({
-      where: { id: appointmentId },
-      data: { status: "CANCELLED" },
+    await prisma.availableSlot.update({
+      where: { id: appointment.availableSlot?.id },
+      data: { appointmentId: null },
     });
 
-    // If there's a linked availableSlot, unlink it
-    if (appointment.availableSlot) {
-      await prisma.availableSlot.update({
-        where: { id: appointment.availableSlot.id },
-        data: { appointmentId: null },
-      });
-    }
+    // Then update the appointment status
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: {
+        status: "CANCELLED",
+        availableSlotId: null,
+        updatedAt: new Date(),
+      },
+    });
 
     // Revalidate UI
     revalidatePath("/client/dashboard");
     revalidatePath("/client/appointments");
+    revalidatePath("/admin/calendar");
 
     return { success: true, message: "Appointment cancelled successfully" };
   } catch (error) {
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Error cancelling appointment",
+      message: "Error cancelling appointment",
     };
   }
 }
@@ -219,7 +219,7 @@ export async function getPastAppointments() {
       date: "desc",
     },
   });
-
+  console.log("past appointments", appointments);
   return appointments;
 }
 
@@ -294,18 +294,31 @@ export async function getAvailableSlots(date: Date) {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
 
+  // Get admin user
+  const admin = await prisma.user.findFirst({
+    where: { role: "ADMIN" },
+  });
+
+  if (!admin) throw new Error("Admin not found");
+
   const timeSlots = await prisma.availableSlot.findMany({
     where: {
       date: {
         gte: startOfDay(date),
         lte: endOfDay(date),
       },
+      adminId: admin.id,
       appointmentId: null,
+    },
+    orderBy: {
+      date: "asc",
     },
   });
 
-  console.log(timeSlots);
-  const availableSlots = timeSlots.map((slot) => format(slot.date, "h:mm a"));
+  const availableSlots = timeSlots.map((slot) => ({
+    timeSlotId: slot.id,
+    time: format(slot.date, "h:mm a"),
+  }));
 
   return availableSlots;
 }
