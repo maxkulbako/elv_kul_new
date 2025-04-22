@@ -28,3 +28,13 @@ export const signUpFormSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+// Schema for create package
+export const createPackageFormSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters long"),
+  description: z.string().min(3, "Description must be at least 3 characters long"),
+  sessionsTotal: z.number().min(1, "Sessions total must be at least 1"),
+  price: z.number().min(0, "Price must be at least 0"),
+  validDays: z.number().min(1, "Valid days must be at least 1"),
+  validFrom: z.coerce.date(),
+});

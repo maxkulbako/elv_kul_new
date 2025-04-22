@@ -39,6 +39,12 @@ enum PricingType {
   CLIENT_PACKAGE
 }
 
+enum PackageStatus {
+  ACTIVE
+  EXPIRED
+  REFUNDED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -53,11 +59,12 @@ model User {
   profession    String?
 
   accounts       Account[]
-  appointments   Appointment[]   @relation("ClientAppointments")
-  created        Appointment[]   @relation("AdminAppointments")
+  appointments   Appointment[]     @relation("ClientAppointments")
+  created        Appointment[]     @relation("AdminAppointments")
   payments       Payment[]
   pricing        ClientPricing[]
-  createdAt      DateTime        @default(now())
+  purchases      PackagePurchase[]
+  createdAt      DateTime          @default(now())
   availableSlots AvailableSlot[]
   sessionToken   Session[]
 }
@@ -73,10 +80,14 @@ model Appointment {
   paymentStatus PaymentStatus @default(PENDING)
   price         Decimal       @default(0.0)
   pricingType   PricingType
-  link          String? // Video call link
-  status        SessionStatus @default(SCHEDULED)
-  notes         String?
-  files         String[] // Array of file URLs
+
+  packagePurchase   PackagePurchase? @relation(fields: [packagePurchaseId], references: [id])
+  packagePurchaseId String?          @unique
+
+  link   String? // Video call link
+  status SessionStatus @default(SCHEDULED)
+  notes  String?
+  files  String[] // Array of file URLs
 
   availableSlot   AvailableSlot? @relation(fields: [availableSlotId], references: [id])
   availableSlotId String?        @unique
@@ -129,6 +140,40 @@ model GlobalPricing {
   validFrom   DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model PackageTemplate {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  sessionsTotal Int
+  price         Decimal
+  validDays     Int
+  isActive      Boolean  @default(true)
+  validFrom     DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  purchases PackagePurchase[]
+}
+
+model PackagePurchase {
+  id         String          @id @default(cuid())
+  client     User            @relation(fields: [clientId], references: [id])
+  clientId   String
+  template   PackageTemplate @relation(fields: [templateId], references: [id])
+  templateId String
+
+  startDate    DateTime
+  endDate      DateTime
+  sessionsUsed Int           @default(0)
+  status       PackageStatus @default(ACTIVE)
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  Appointment Appointment?
+
+  @@index([clientId, status])
 }
 
 // === NextAuth ===

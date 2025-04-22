@@ -23,3 +23,18 @@ export function combineDateAndTime(isoDate: string, timeString: string): Date {
   // Parse to a Date object using date-fns with expected format
   return parse(dateTimeString, "yyyy-MM-dd h:mm a", new Date());
 }
+
+export const calculateSavings = (
+  regularPrice: number,
+  sessions: number,
+  packagePrice: number
+) => {
+  const regularTotal = regularPrice * sessions;
+  const savings = regularTotal - packagePrice;
+  const percentage = (savings / regularTotal) * 100;
+
+  return {
+    amount: savings,
+    percentage: Math.round(percentage),
+  };
+};
