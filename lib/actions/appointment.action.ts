@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 import { Decimal } from "@prisma/client/runtime/library";
-import { combineDateAndTime } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { format, startOfDay, endOfDay } from "date-fns";
 
@@ -78,7 +77,7 @@ export async function scheduleAppointment(
       data: {
         date: availableSlot.date,
         durationMin: 50,
-        clientId: session.user.id,
+        clientId: session.user.id as string,
         adminId: admin.id,
         price: finalPrice,
         paymentStatus: "PENDING",
@@ -219,7 +218,7 @@ export async function getPastAppointments() {
       date: "desc",
     },
   });
-  console.log("past appointments", appointments);
+
   return appointments;
 }
 

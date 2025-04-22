@@ -15,11 +15,11 @@ export async function middleware(req: NextRequest) {
   const { pathname } = new URL(req.url);
 
   if (pathname.startsWith("/admin") && token.role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/403", req.url));
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
   if (pathname.startsWith("/client") && token.role !== "CLIENT") {
-    return NextResponse.redirect(new URL("/403", req.url));
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
   return NextResponse.next();
