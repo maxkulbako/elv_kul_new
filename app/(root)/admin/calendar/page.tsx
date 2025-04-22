@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import CalendarView from "./CalendarView";
 import { getAdminAppointmentsDates } from "@/lib/actions/admin.action";
+import { CalendarViewSkeleton } from "./CalendarViewSkeleton";
 
 export default async function CalendarPage() {
   const today = new Date();
@@ -8,5 +10,9 @@ export default async function CalendarPage() {
     today.getMonth()
   );
 
-  return <CalendarView initialDates={initialDates} />;
+  return (
+    <Suspense fallback={<CalendarViewSkeleton />}>
+      <CalendarView initialDates={initialDates} />
+    </Suspense>
+  );
 }

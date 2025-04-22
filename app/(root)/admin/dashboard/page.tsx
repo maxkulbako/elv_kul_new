@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/card";
 import { Users, Clock, CreditCard, Video } from "lucide-react";
 import { auth } from "@/auth";
-import { requireAdminAuth } from "@/lib/auth/require-admin";
 import UpcomingSessionsSection from "./UpcomingSessionsSection";
+import { format } from "date-fns";
 
 // Mock data for upcoming appointments
 const upcomingAppointments = [
@@ -58,27 +58,8 @@ const revenueData = {
 };
 
 const AdminDashboardPage: React.FC = async () => {
-  await requireAdminAuth();
   const session = await auth();
   const user = session?.user;
-
-  // Format date to display time
-  const formatTime = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    }).format(date);
-  };
-
-  // Format date for display
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    }).format(date);
-  };
 
   return (
     <>
@@ -158,7 +139,7 @@ const AdminDashboardPage: React.FC = async () => {
                         Next Session
                       </p>
                       <p className="text-2xl font-semibold">
-                        {formatTime(upcomingAppointments[0].date)}
+                        {format(upcomingAppointments[0].date, "HH:mm")}
                       </p>
                       <p className="text-sm text-olive-primary">
                         {upcomingAppointments[0].clientName}

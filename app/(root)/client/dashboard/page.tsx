@@ -7,7 +7,6 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { requireClientAuth } from "@/lib/auth/require-client";
 import { CalendarPlus, Calendar, CreditCard, Video } from "lucide-react";
 import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
 import { NextAppointmentCard } from "@/app/(root)/client/dashboard/NextAppontmentCard";
@@ -22,11 +21,8 @@ import { Suspense } from "react";
 import { UpcomingAppointments } from "@/app/(root)/client/dashboard/UpcomingAppointments";
 
 const ClientDashboardPage = async () => {
-  await requireClientAuth();
   const session = await auth();
   const user = session?.user;
-
-  if (!user) throw new Error("User not found");
 
   return (
     <div className="flex-grow container py-8 mx-auto">

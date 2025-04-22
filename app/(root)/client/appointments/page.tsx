@@ -1,4 +1,3 @@
-import { requireClientAuth } from "@/lib/auth/require-client";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
@@ -9,8 +8,6 @@ import { PastAppointmentsSection } from "./PastAppointmentsSection";
 import { CalendarAppointmentsSection } from "./CalendarAppointmentsSection";
 
 const AppointmentsPage = async () => {
-  await requireClientAuth();
-
   return (
     <div className="container py-8 mx-auto">
       <div className="flex justify-between items-center mb-6">

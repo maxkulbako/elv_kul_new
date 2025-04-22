@@ -9,14 +9,15 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { auth } from "@/auth";
 import Link from "next/link";
 import CustomSideBarMenuButton from "./CustomSideBarMenuButton";
+import { Session } from "next-auth";
 
-const AppSideBar = async () => {
-  const session = await auth();
-  const user = session?.user;
+interface AppSideBarProps {
+  user: Session["user"] | null | undefined;
+}
 
+const AppSideBar = async ({ user }: AppSideBarProps) => {
   return (
     <Sidebar
       className="border-r border-olive-primary/20 h-auto hidden lg:block"
@@ -25,7 +26,7 @@ const AppSideBar = async () => {
       <SidebarHeader className="border-b border-olive-primary/20 py-4">
         <div className="flex items-center px-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-olive-primary text-white mr-3">
-            {user?.name.charAt(0).toUpperCase()}
+            {user?.name?.charAt(0).toUpperCase()}
           </div>
           <div>
             {/* <h3 className="font-medium">Dr. {user?.name}</h3> */}

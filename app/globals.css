@@ -200,6 +200,12 @@
     }
   }
 
+  @keyframes oliveSpin {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
   .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
   }
