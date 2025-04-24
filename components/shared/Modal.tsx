@@ -18,7 +18,7 @@ const Modal = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Dialog defaultOpen={true} open={true} onOpenChange={handleOpenChange}>
-      <DialogHeader>
+      <DialogHeader className="hidden">
         <DialogTitle>Create New Service Package</DialogTitle>
         <DialogDescription>
           Set up a new package with special pricing for your therapy services.

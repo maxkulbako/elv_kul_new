@@ -11,6 +11,7 @@ import { calculateSavings } from "@/lib/utils";
 import { Package, Calendar, Edit, Trash } from "lucide-react";
 import { Decimal } from "@prisma/client/runtime/library";
 import PackageDisactiveDialog from "./PackageDisactiveDialog";
+import Link from "next/link";
 
 export interface IPackageCard {
   id: string;
@@ -104,10 +105,12 @@ const PackageCard = ({
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="ghost" size="sm">
-          <Edit className="h-4 w-4 mr-1" />
-          Edit
-        </Button>
+        <Link href={`/admin/packages/${packageData.id}/edit`}>
+          <Button variant="ghost" size="sm">
+            <Edit className="h-4 w-4 mr-1" />
+            Edit
+          </Button>
+        </Link>
         <PackageDisactiveDialog
           id={packageData.id}
           isActive={packageData.isActive}

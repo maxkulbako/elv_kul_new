@@ -8,11 +8,18 @@ import { useForm } from "react-hook-form";
 import { createPackageFormSchema } from "@/lib/validations";
 import { CreatePackageFormValues } from "@/types";
 import { useTransition } from "react";
-import { createPackageTemplateAction } from "@/lib/actions/price.action";
+import {
+  createPackageTemplateAction,
+  updatePackageTemplateAction,
+} from "@/lib/actions/price.action";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-const PackageDialog = () => {
+interface PackageFormProps {
+  initialData?: CreatePackageFormValues & { id: string };
+}
+
+const PackageForm = ({ initialData }: PackageFormProps) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -23,14 +30,7 @@ const PackageDialog = () => {
     reset,
   } = useForm<CreatePackageFormValues>({
     resolver: zodResolver(createPackageFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      sessionsTotal: 0,
-      price: 0,
-      validDays: 0,
-      validFrom: new Date(),
-    },
+    defaultValues: initialData,
   });
 
   const handleAddPackage = async (data: CreatePackageFormValues) => {
@@ -43,7 +43,13 @@ const PackageDialog = () => {
     formData.append("validFrom", data.validFrom.toISOString());
 
     startTransition(async () => {
-      const result = await createPackageTemplateAction(formData);
+      let result;
+
+      if (initialData?.id) {
+        result = await updatePackageTemplateAction(initialData.id, formData);
+      } else {
+        result = await createPackageTemplateAction(formData);
+      }
       if (result?.success) {
         toast.success(result.message, {
           richColors: true,
@@ -152,11 +158,17 @@ const PackageDialog = () => {
           type="submit"
           disabled={isPending}
         >
-          {isPending ? "Creating..." : "Create Package"}
+          {initialData
+            ? isPending
+              ? "Updating..."
+              : "Update Package"
+            : isPending
+              ? "Creating..."
+              : "Create Package"}
         </Button>
       </div>
     </form>
   );
 };
 
-export default PackageDialog;
+export default PackageForm;
