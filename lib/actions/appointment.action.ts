@@ -5,64 +5,35 @@ import { auth } from "@/auth";
 import { Decimal } from "@prisma/client/runtime/library";
 import { revalidatePath } from "next/cache";
 import { format, startOfDay, endOfDay } from "date-fns";
+import { Prisma } from "@prisma/client";
 
 export async function scheduleAppointment(
   _prevState: unknown,
   formData: FormData
-) {
+): Promise<{
+  success: boolean;
+  message: string;
+  requiresPayment?: boolean;
+  clientSecret?: string;
+  orderId?: string;
+}> {
   const session = await auth();
+  const clientId = session?.user?.id;
 
-  if (!session) throw new Error("Unauthorized");
-  if (!formData.get("date") || !formData.get("timeSlotId"))
-    return {
-      success: false,
-      message: "Date and time slot are required",
-    };
+  if (!clientId) throw new Error("Unauthorized");
+
+  const timeSlotId = formData.get("timeSlotId") as string | null;
+  const dateIso = formData.get("date") as string | null;
+
+  if (!timeSlotId) {
+    return { success: false, message: "Time slot ID is required" };
+  }
 
   try {
-    const appointmentId = formData.get("appointmentId") as string | null;
-
-    // If the appointment is being rescheduled, update the status
-    if (appointmentId) {
-      await prisma.appointment.update({
-        where: { id: appointmentId },
-        data: {
-          status: "RESCHEDULED",
-          availableSlotId: null,
-          updatedAt: new Date(),
-        },
-      });
-      await prisma.availableSlot.update({
-        where: { appointmentId: appointmentId },
-        data: { appointmentId: null },
-      });
-    }
-
-    // 1. Fetch the global single pricing
-    const globalPricing = await prisma.globalPricing.findFirst({
-      orderBy: { validFrom: "desc" }, // most recent
-    });
-
-    // 2. Define the final price
-    const DEFAULT_PRICE = new Decimal(50); // TODO: get from global pricing
-
-    const finalPrice =
-      globalPricing?.singlePrice && globalPricing.singlePrice.gt(0)
-        ? globalPricing.singlePrice
-        : DEFAULT_PRICE;
-
-    const pricingType = "GLOBAL_SINGLE";
-
-    // 3. Get admin user (since we only have one admin)
-    const admin = await prisma.user.findFirst({
-      where: { role: "ADMIN" },
-    });
-
-    if (!admin) throw new Error("Admin not found");
-
-    // 4. Find available slot
-    const availableSlot = await prisma.availableSlot.findFirst({
-      where: { id: formData.get("timeSlotId") as string },
+    // 1. Fetch the available slot and adminId
+    const availableSlot = await prisma.availableSlot.findUnique({
+      where: { id: timeSlotId, appointmentId: undefined },
+      include: { admin: true },
     });
 
     if (!availableSlot) {
@@ -72,44 +43,267 @@ export async function scheduleAppointment(
       };
     }
 
-    // 5. Create the appointment
-    const appointment = await prisma.appointment.create({
-      data: {
-        date: availableSlot.date,
-        durationMin: 50,
-        clientId: session.user.id as string,
-        adminId: admin.id,
-        price: finalPrice,
-        paymentStatus: "PENDING",
-        status: "SCHEDULED",
-        availableSlotId: availableSlot.id,
-        pricingType,
+    if (!availableSlot.admin) {
+      console.error(`Admin not found for available slot ${timeSlotId}`);
+      return {
+        success: false,
+        message: "Admin associated with the slot not found.",
+      };
+    }
+
+    const adminId = availableSlot.admin.id;
+
+    // 2. Check if the client has an active package
+    const now = new Date();
+    const activePackage = await prisma.packagePurchase.findFirst({
+      where: {
+        clientId: clientId,
+        status: "ACTIVE",
+        sessionsUsed: { lt: prisma.packagePurchase.fields.sessionsTotal },
+        endDate: { gte: startOfDay(now) },
       },
+      orderBy: { endDate: "desc" },
+      include: { packageTemplate: true },
     });
 
-    // 5.Link the slot
-    await prisma.availableSlot.update({
-      where: { id: availableSlot.id },
-      data: {
-        appointmentId: appointment.id,
-      },
-    });
+    if (activePackage) {
+      // 3. Package found: Create Appointment and update PackagePurchase in a transaction
+      try {
+        const newAppointment = await prisma.$transaction(async (tx) => {
+          // 3.1 Create Appointment
+          const createdAppointment = await tx.appointment.create({
+            data: {
+              date: availableSlot.date,
+              durationMin: 50, // TODO: Think about it
+              clientId: clientId,
+              adminId: adminId,
+              status: "PAID_FROM_PACKAGE",
+              priceApplied: new Decimal(0),
+              packagePurchaseId: activePackage.id,
+              availableSlotId: availableSlot.id,
+            },
+          });
 
-    // Revalidate the client dashboard and appointments page
-    revalidatePath("/client/dashboard");
-    revalidatePath("/client/appointments");
+          // 3.2 Update the used sessions in the package
+          const updatedPackage = await tx.packagePurchase.update({
+            where: { id: activePackage.id },
+            data: {
+              sessionsUsed: {
+                increment: 1,
+              },
+            },
+          });
 
-    return {
-      success: true,
-      message: appointmentId
-        ? "Appointment rescheduled successfully"
-        : "Appointment scheduled successfully",
-    };
+          // 3.3 Check if the package became expired after this session
+          if (updatedPackage.sessionsUsed >= updatedPackage.sessionsTotal) {
+            await tx.packagePurchase.update({
+              where: { id: activePackage.id },
+              data: { status: "EXPIRED" },
+            });
+          }
+
+          // 3.4 Link the slot to the new Appointment (safer within transaction)
+          await tx.availableSlot.update({
+            where: { id: availableSlot.id },
+            data: { appointmentId: createdAppointment.id },
+          });
+
+          return createdAppointment;
+        });
+
+        revalidatePath("/client/dashboard");
+        revalidatePath("/client/appointments");
+        revalidatePath("/admin/calendar");
+
+        return {
+          success: true,
+          message: "Appointment scheduled successfully using your package.",
+        };
+      } catch (e) {
+        console.error("Transaction failed when using package:", e);
+        // TODO: Think about rolling back the status, if something went wrong inside the transaction
+        // (although $transaction should do this automatically for DB errors)
+        return {
+          success: false,
+          message: "Failed to use package for scheduling. Please try again.",
+        };
+      }
+    } else {
+      // --- Start Implementation for Individual Payment ---
+
+      // 4.1 Determine the price
+      let finalPrice: Decimal | null = null;
+      let pricingType: "GLOBAL_SINGLE" | "CLIENT_SINGLE" | null = null;
+
+      // Check for client-specific price first
+      const clientData = await prisma.user.findUnique({
+        where: { id: clientId },
+        select: { clientSpecialPrice: true },
+      });
+
+      if (
+        clientData?.clientSpecialPrice &&
+        clientData.clientSpecialPrice.greaterThan(0)
+      ) {
+        finalPrice = clientData.clientSpecialPrice;
+        pricingType = "CLIENT_SINGLE";
+      } else {
+        // If no client price, get global price
+        const globalPriceData = await prisma.globalPricing.findFirst({
+          orderBy: { validFrom: "desc" }, // Get the latest active global price
+        });
+
+        if (
+          globalPriceData?.singlePrice &&
+          globalPriceData.singlePrice.greaterThan(0)
+        ) {
+          finalPrice = globalPriceData.singlePrice;
+          pricingType = "GLOBAL_SINGLE";
+        }
+      }
+
+      // Check if a price was determined
+      if (!finalPrice) {
+        console.error(
+          `Could not determine price for client ${clientId} and no active package.`
+        );
+        return {
+          success: false,
+          message:
+            "Could not determine the appointment price. Please contact support.",
+        };
+      }
+
+      // 4.2 Create Appointment (PENDING_PAYMENT) and Order within a transaction
+      try {
+        const { appointment, order } = await prisma.$transaction(async (tx) => {
+          // Create Order first
+          const createdOrder = await tx.order.create({
+            data: {
+              userId: clientId,
+              type: "SINGLE_SESSION",
+              amount: finalPrice as Decimal,
+              currency: "USD", // TODO: Or get from config/settings
+              status: "PENDING",
+              // paymentIntentId will be added after Stripe call
+            },
+          });
+
+          // Create Appointment linking to the Order
+          const createdAppointment = await tx.appointment.create({
+            data: {
+              date: availableSlot.date,
+              durationMin: availableSlot.duration,
+              clientId: clientId,
+              adminId: adminId,
+              status: "PENDING_PAYMENT",
+              priceApplied: finalPrice as Decimal,
+              orderId: createdOrder.id,
+              availableSlotId: availableSlot.id,
+              // packagePurchaseId remains null
+            },
+          });
+
+          // Link slot (redundant, but ensures consistency if needed elsewhere)
+          await tx.availableSlot.update({
+            where: { id: availableSlot.id },
+            data: { appointmentId: createdAppointment.id },
+          });
+
+          return { appointment: createdAppointment, order: createdOrder };
+        });
+
+        // 4.3 Initiate Payment with Stripe (outside the DB transaction)
+        // This part requires integrating the Stripe SDK
+        /*
+         try {
+            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!); // Initialize Stripe
+
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: finalPrice.mul(100).toNumber(), // Amount in cents
+                currency: order.currency.toLowerCase(),
+                metadata: {
+                    orderId: order.id,
+                    appointmentId: appointment.id,
+                    userId: clientId,
+                },
+                // Add customer ID if you manage customers in Stripe
+                // customer: stripeCustomerId,
+            });
+
+            // 4.4 Update Order with Payment Intent ID
+            await prisma.order.update({
+                where: { id: order.id },
+                data: { paymentIntentId: paymentIntent.id }
+            });
+
+            revalidatePath("/client/dashboard");
+            revalidatePath("/client/appointments");
+            revalidatePath("/admin/calendar");
+
+            // Return client secret to the frontend to confirm the payment
+            return {
+                success: true,
+                message: "Appointment pending payment.",
+                requiresPayment: true,
+                clientSecret: paymentIntent.client_secret,
+                orderId: order.id
+            };
+
+         } catch (stripeError) {
+             console.error("Stripe Payment Intent creation failed:", stripeError);
+             // TODO: Consider how to handle this - maybe mark order/appointment as failed?
+             return { success: false, message: "Failed to initiate payment process. Please try again." };
+         }
+         */
+        // --- Placeholder until Stripe is integrated ---
+        console.log(
+          `Order ${order.id} and Appointment ${appointment.id} created with PENDING status. Price: ${finalPrice}`
+        );
+
+        revalidatePath("/client/dashboard");
+        revalidatePath("/client/appointments");
+        revalidatePath("/admin/calendar");
+        
+        return {
+          success: true,
+          message:
+            "Appointment created, pending payment (Stripe integration needed).",
+          requiresPayment: true,
+          orderId: order.id,
+        };
+
+        
+      } catch (e) {
+        console.error("Transaction failed for individual payment:", e);
+        // Handle specific errors like unique constraint on slot again
+        if (
+          e instanceof Prisma.PrismaClientKnownRequestError &&
+          e.code === "P2002"
+        ) {
+          return {
+            success: false,
+            message: "This time slot was just booked. Please select another.",
+          };
+        }
+        return {
+          success: false,
+          message: "Failed to schedule appointment. Please try again.",
+        };
+      }
+    }
   } catch (error) {
-    return {
-      success: false,
-      message: "Error scheduling appointment",
-    };
+    console.error("Error scheduling appointment:", error);
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return {
+        success: false,
+        message: "This time slot was just booked. Please select another.",
+      };
+    }
+    return { success: false, message: "An unexpected error occurred." };
   }
 }
 
@@ -180,7 +374,7 @@ export async function getCalendarAppointments() {
   // Convert Decimal price to number
   return appointments.map((appointment) => ({
     ...appointment,
-    price: Number(appointment.price),
+    price: Number(appointment.priceApplied),
   }));
 }
 

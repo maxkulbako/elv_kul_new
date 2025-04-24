@@ -19,10 +19,12 @@ enum PaymentStatus {
   CANCELLED
 }
 
-enum SessionStatus {
+enum AppointmentStatus {
   SCHEDULED
+  PENDING_PAYMENT
+  PAID
+  PAID_FROM_PACKAGE
   COMPLETED
-  MISSED
   CANCELLED
   RESCHEDULED
 }
@@ -45,6 +47,25 @@ enum PackageStatus {
   REFUNDED
 }
 
+enum PackagePurchaseStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum OrderType {
+  PACKAGE
+  SINGLE_SESSION
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -58,42 +79,69 @@ model User {
   telegram      String?
   profession    String?
 
-  accounts       Account[]
-  appointments   Appointment[]     @relation("ClientAppointments")
-  created        Appointment[]     @relation("AdminAppointments")
-  payments       Payment[]
-  pricing        ClientPricing[]
-  purchases      PackagePurchase[]
-  createdAt      DateTime          @default(now())
+  clientSpecialPrice Decimal?
+  orders             Order[]
+
+  appointments Appointment[] @relation("ClientAppointments")
+  created      Appointment[] @relation("AdminAppointments")
+
+  payments  Payment[]
+  pricing   ClientPricing[]
+  purchases PackagePurchase[]
+
   availableSlots AvailableSlot[]
-  sessionToken   Session[]
+
+  // NextAuth
+  accounts     Account[]
+  sessionToken Session[]
+
+  createdAt DateTime @default(now())
 }
 
 model Appointment {
-  id            String        @id @default(cuid())
-  date          DateTime
-  durationMin   Int
-  client        User          @relation("ClientAppointments", fields: [clientId], references: [id])
-  clientId      String
-  admin         User          @relation("AdminAppointments", fields: [adminId], references: [id])
-  adminId       String
-  paymentStatus PaymentStatus @default(PENDING)
-  price         Decimal       @default(0.0)
-  pricingType   PricingType
+  id          String   @id @default(cuid())
+  date        DateTime
+  durationMin Int
+  client      User     @relation("ClientAppointments", fields: [clientId], references: [id])
+  clientId    String
+  admin       User     @relation("AdminAppointments", fields: [adminId], references: [id])
+  adminId     String
+  notes       String?
+  files       String[] // Array of file URLs
+  link        String? // Video call link
+
+  status       AppointmentStatus @default(SCHEDULED)
+  priceApplied Decimal?
 
   packagePurchase   PackagePurchase? @relation(fields: [packagePurchaseId], references: [id])
-  packagePurchaseId String?          @unique
+  packagePurchaseId String?
 
-  link   String? // Video call link
-  status SessionStatus @default(SCHEDULED)
-  notes  String?
-  files  String[] // Array of file URLs
+  orderId String? @unique //
+  order   Order?  @relation(fields: [orderId], references: [id])
 
   availableSlot   AvailableSlot? @relation(fields: [availableSlotId], references: [id])
   availableSlotId String?        @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id])
+  type            OrderType
+  amount          Decimal
+  currency        String
+  status          OrderStatus @default(PENDING)
+  paymentIntentId String?     @unique
+  paidAt          DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  packagePurchase PackagePurchase?
+  appointment     Appointment?
 }
 
 model AvailableSlot {
@@ -158,20 +206,25 @@ model PackageTemplate {
 }
 
 model PackagePurchase {
-  id         String          @id @default(cuid())
-  client     User            @relation(fields: [clientId], references: [id])
-  clientId   String
-  template   PackageTemplate @relation(fields: [templateId], references: [id])
-  templateId String
+  id                String          @id @default(cuid())
+  client            User            @relation(fields: [clientId], references: [id])
+  clientId          String
+  packageTemplate   PackageTemplate @relation(fields: [packageTemplateId], references: [id])
+  packageTemplateId String
 
-  startDate    DateTime
-  endDate      DateTime
-  sessionsUsed Int           @default(0)
-  status       PackageStatus @default(ACTIVE)
+  startDate     DateTime
+  endDate       DateTime
+  sessionsTotal Int
+  sessionsUsed  Int                   @default(0)
+  status        PackagePurchaseStatus @default(PENDING)
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  Appointment Appointment?
+  orderId String? @unique
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  appointmentsUsedIn Appointment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([clientId, status])
 }
