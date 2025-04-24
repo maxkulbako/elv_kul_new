@@ -14,6 +14,7 @@ import {
   Calendar,
   Settings,
   LogOut,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -67,6 +68,15 @@ const ClientNavBar = ({ session }: { session: Session }) => {
               >
                 <Calendar className="mr-2 h-4 w-4" />
                 <span className="font-semibold text-[16px] ">Записи</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link
+                href="/client/packages"
+                className="flex items-center text-olive-primary hover:bg-olive-light p-2 rounded-md"
+              >
+                <Package className="mr-2 h-4 w-4" />
+                <span className="font-semibold text-[16px] ">Мої пакети</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>

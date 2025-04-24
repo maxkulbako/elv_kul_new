@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Calendar, Settings, LogOut } from "lucide-react";
+import { User, Calendar, Settings, LogOut, Package } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { signOutUser } from "@/lib/actions/user.action";
@@ -74,6 +74,15 @@ const ClientMobileNavBar = ({ session }: { session: any }) => {
             >
               <span className="flex items-center gap-2 text-olive-primary font-semibold">
                 <Calendar className="w-4 h-4" /> Записи
+              </span>
+            </Link>
+            <Link
+              href="/client/packages"
+              onClick={() => setIsOpen(false)}
+              className="hover:bg-olive-light p-2 rounded-md"
+            >
+              <span className="flex items-center gap-2 text-olive-primary font-semibold">
+                <Package className="w-4 h-4" /> Мої пакети
               </span>
             </Link>
             <Link
