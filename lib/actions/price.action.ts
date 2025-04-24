@@ -33,6 +33,7 @@ export async function updateGlobalPrice(formData: FormData) {
   await prisma.globalPricing.create({
     data: { singlePrice },
   });
+
   return { success: true, message: "Price updated successfully" };
 }
 
@@ -47,6 +48,7 @@ export async function getPackageTemplates() {
       },
     ],
   });
+
   return packageTemplates;
 }
 
@@ -71,6 +73,9 @@ export async function createPackageTemplateAction(formData: FormData) {
       validFrom: validFrom ? new Date(validFrom) : undefined,
     },
   });
+
+  revalidatePath("/admin/packages");
+
   return { success: true, message: "Package created successfully" };
 }
 

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import PackagesSection from "./PackagesSection";
 import GlobalPriceSection from "./GlobalPriceSection";
-import CreatePackageDialog from "./CreatePackageDialog";
+import Link from "next/link";
 
 const ServicePackagesPage: React.FC = async () => {
   return (
@@ -16,12 +16,14 @@ const ServicePackagesPage: React.FC = async () => {
                 Create and manage therapy session packages
               </p>
             </div>
+
             <Button
               className="bg-olive-primary hover:bg-olive-primary/90"
-              // onClick={() => setIsAddingPackage(true)}
               asChild
             >
-              <CreatePackageDialog />
+              <Link href="/admin/packages/create">
+                <Plus /> Create Package
+              </Link>
             </Button>
           </div>
           <GlobalPriceSection />
