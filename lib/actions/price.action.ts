@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { prisma } from "../prisma";
 
 export async function getGlobalPrice() {
@@ -37,9 +38,14 @@ export async function updateGlobalPrice(formData: FormData) {
 
 export async function getPackageTemplates() {
   const packageTemplates = await prisma.packageTemplate.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy: [
+      {
+        isActive: "desc",
+      },
+      {
+        createdAt: "desc",
+      },
+    ],
   });
   return packageTemplates;
 }
@@ -66,4 +72,22 @@ export async function createPackageTemplateAction(formData: FormData) {
     },
   });
   return { success: true, message: "Package created successfully" };
+}
+
+export async function updatePackageTemplateStatusAction(
+  id: string,
+  isActive: boolean
+) {
+  try {
+    await prisma.packageTemplate.update({
+      where: { id },
+      data: { isActive: !isActive },
+    });
+
+    revalidatePath("/admin/packages");
+
+    return { success: true, message: "Package status updated successfully" };
+  } catch (error) {
+    return { success: false, message: "Failed to update package status" };
+  }
 }

@@ -1,4 +1,3 @@
-// app/(admin)/packages/PackagesSection.tsx
 import {
   getPackageTemplates,
   getGlobalPrice,
