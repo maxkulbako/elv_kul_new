@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardHeader,
@@ -6,28 +8,49 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  AvailablePackageTemplate,
+  purchasePackegeAction,
+} from "@/lib/actions/price.action";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
+const AvailablePackagesTab = ({
+  packages,
+}: {
+  packages: AvailablePackageTemplate[];
+}) => {
+  const [state, action, isPending] = useActionState(purchasePackegeAction, {
+    success: false,
+    message: "",
+  });
 
-const availablePackages = [
-  {
-    id: 1,
-    name: "Basic Package",
-    sessions: 4,
-    price: 199,
-    description: "4 therapy sessions per month",
-  },
-  {
-    id: 2,
-    name: "Premium Package",
-    sessions: 8,
-    price: 379,
-    description: "8 therapy sessions per month",
-  },
-];
+  useEffect(() => {
+    if (!state) return;
 
-const AvailablePackagesTab = () => {
+    if (state.success) {
+      toast.success(state.message || "Package added to orders!", {
+        richColors: true,
+      });
+    } else if (state.message) {
+      toast.error(state.message || "Failed to add package to orders.", {
+        richColors: true,
+      });
+    }
+  }, [state]);
+
+  if (!packages || packages.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          No packages available for purchase right now.
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="grid md:grid-cols-2 gap-6">
-      {availablePackages.map((pkg) => (
+      {packages.map((pkg) => (
         <Card key={pkg.id}>
           <CardHeader>
             <CardTitle>{pkg.name}</CardTitle>
@@ -39,12 +62,26 @@ const AvailablePackagesTab = () => {
                 <div>
                   <p className="text-2xl font-bold">${pkg.price}</p>
                   <p className="text-sm text-muted-foreground">
-                    {pkg.sessions} sessions included
+                    {pkg.sessionsTotal} sessions included
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Valid for {pkg.validDays} days
                   </p>
                 </div>
-                <Button className="bg-olive-primary hover:bg-olive-primary/90">
-                  Purchase Package
-                </Button>
+                <form action={action}>
+                  <input
+                    type="hidden"
+                    name="packageTemplateId"
+                    value={pkg.id}
+                  />
+                  <Button
+                    className="bg-olive-primary hover:bg-olive-primary/90"
+                    type="submit"
+                    disabled={isPending}
+                  >
+                    {isPending ? "Processing..." : "Purchase Package"}
+                  </Button>
+                </form>
               </div>
             </div>
           </CardContent>

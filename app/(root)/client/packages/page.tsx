@@ -12,8 +12,11 @@ import { ShoppingCart, Package, Receipt } from "lucide-react";
 import ActivePackageTab from "./ActivePackageTab";
 import AvailablePackagesTab from "./AvailablePackagesTab";
 import OrdersTab from "./OrdersTab";
+import { getAvailablePackages } from "@/lib/actions/price.action";
 
-const UserPackagesPage = () => {
+const UserPackagesPage = async () => {
+  const availablePackages = await getAvailablePackages();
+
   return (
     <div className="flex-grow container py-8 mx-auto">
       <div className="mb-8">
@@ -35,7 +38,7 @@ const UserPackagesPage = () => {
         </TabsContent>
 
         <TabsContent value="available">
-          <AvailablePackagesTab />
+          <AvailablePackagesTab packages={availablePackages} />
         </TabsContent>
 
         <TabsContent value="orders">

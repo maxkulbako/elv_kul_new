@@ -212,8 +212,8 @@ model PackagePurchase {
   packageTemplate   PackageTemplate @relation(fields: [packageTemplateId], references: [id])
   packageTemplateId String
 
-  startDate     DateTime
-  endDate       DateTime
+  startDate     DateTime?
+  endDate       DateTime?
   sessionsTotal Int
   sessionsUsed  Int                   @default(0)
   status        PackagePurchaseStatus @default(PENDING)
