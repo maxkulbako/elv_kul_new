@@ -6,13 +6,13 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format, isSameDay } from "date-fns";
-import { Calendar as CalendarIcon, Video, User } from "lucide-react";
+import { Video, User } from "lucide-react";
 import { AvailabilityManager } from "./AvailabilityManager";
 import {
   getAdminAppointmentsDates,
   getAdminAppointmentsByDate,
 } from "@/lib/actions/admin.action";
-import { SessionStatus } from "@prisma/client";
+import { AppointmentStatus } from "@prisma/client";
 
 interface Session {
   id: string;
@@ -21,7 +21,7 @@ interface Session {
   date: Date;
   durationMin: number;
   type: string;
-  status: SessionStatus;
+  status: AppointmentStatus;
 }
 
 interface CalendarViewProps {
@@ -30,7 +30,10 @@ interface CalendarViewProps {
 
 const CalendarView: React.FC<CalendarViewProps> = ({ initialDates }) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [videoSessionOpen, setVideoSessionOpen] = useState<boolean>(false);
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [currentSession, setCurrentSession] = useState<Session | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [datesWithSessions, setDatesWithSessions] =
@@ -57,7 +60,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ initialDates }) => {
     startTransition(async () => {
       const dates = await getAdminAppointmentsDates(
         date.getFullYear(),
-        date.getMonth()
+        date.getMonth(),
       );
       setDatesWithSessions(dates);
       setSessions([]); // Clear sessions when changing month

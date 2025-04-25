@@ -8,7 +8,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { calculateSavings } from "@/lib/utils";
-import { Package, Calendar, Edit, Trash } from "lucide-react";
+import { Package, Calendar, Edit } from "lucide-react";
 import { Decimal } from "@prisma/client/runtime/library";
 import PackageDisactiveDialog from "./PackageDisactiveDialog";
 import Link from "next/link";
@@ -81,7 +81,7 @@ const PackageCard = ({
                 calculateSavings(
                   Number(regularPrice),
                   packageData.sessionsTotal,
-                  Number(packageData.price)
+                  Number(packageData.price),
                 ).amount
               }
               (
@@ -89,7 +89,7 @@ const PackageCard = ({
                 calculateSavings(
                   Number(regularPrice),
                   packageData.sessionsTotal,
-                  Number(packageData.price)
+                  Number(packageData.price),
                 ).percentage
               }
               %)

@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/card";
 import {
   AlertTriangle,
-  ArrowRight,
-  Check,
   CircleDollarSign,
   Receipt,
   X,
@@ -80,14 +78,14 @@ const OrderActions = ({
   isCurrentOrderCancelling, // Is *this* order being cancelled?
   onPayNow,
   onInitiateCancel, // Function to call when "Yes, Cancel" is clicked
-  onRetry,
+  //onRetry,
 }: {
   order: UserOrder;
   isCancelling: boolean;
   isCurrentOrderCancelling: boolean;
   onPayNow: (orderId: string) => void;
   onInitiateCancel: (orderId: string) => void; // Renamed for clarity
-  onRetry: (orderId: string) => void;
+  //onRetry: (orderId: string) => void;
 }) => {
   switch (order.status) {
     case "PENDING":
@@ -121,7 +119,7 @@ const OrderActions = ({
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently cancel
-                  your pending order for "{order.details}".
+                  your pending order for &quot;{order.details}&quot;.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -184,7 +182,7 @@ const OrderActions = ({
 const OrdersTab = ({ orders }: OrdersTabProps) => {
   const [isCancelPending, startCancelTransition] = useTransition();
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(
-    null
+    null,
   );
 
   const handlePayNow = (orderId: string) => {
@@ -276,7 +274,7 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
                       }
                       onPayNow={handlePayNow}
                       onInitiateCancel={handleCancelOrder}
-                      onRetry={() => console.log(order.id)}
+                      //onRetry={() => console.log(order.id)}
                     />
                   </div>
                 </div>
@@ -289,7 +287,7 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
           <CardContent className="p-6">
             <div className="text-center space-y-4">
               <Receipt className="h-12 w-12 mx-auto text-olive-primary" />
-              <p>You don't have any orders yet.</p>
+              <p>You don&apos;t have any orders yet.</p>
               <Button className="bg-olive-primary hover:bg-olive-primary/90">
                 Browse Packages
               </Button>

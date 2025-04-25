@@ -82,7 +82,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
         richColors: true,
       });
     }
-  }, [state]);
+  }, [state, onSuccess, onClose]);
 
   const handleSubmit = async (formData: FormData) => {
     if (!date || !selectedTimeSlot) {
@@ -123,7 +123,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
                   variant={"outline"}
                   className={cn(
                     "w-full pl-3 text-left font-normal",
-                    !date && "text-muted-foreground"
+                    !date && "text-muted-foreground",
                   )}
                   type="button"
                 >
@@ -167,7 +167,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
                     className={cn(
                       selectedTimeSlot?.timeSlotId === time.timeSlotId
                         ? "bg-olive-primary text-white"
-                        : "border-olive-primary text-olive-primary"
+                        : "border-olive-primary text-olive-primary",
                     )}
                     onClick={() => setSelectedTimeSlot(time)}
                     type="button"
@@ -196,8 +196,8 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
               {isPending
                 ? "Scheduling..."
                 : isRescheduling
-                ? "Reschedule"
-                : "Schedule"}
+                  ? "Reschedule"
+                  : "Schedule"}
             </Button>
           </DialogFooter>
         </form>

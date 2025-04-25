@@ -101,7 +101,7 @@ export async function getPackageTemplateById(id: string) {
 
 export async function updatePackageTemplateStatusAction(
   id: string,
-  isActive: boolean
+  isActive: boolean,
 ) {
   try {
     await prisma.packageTemplate.update({
@@ -113,13 +113,14 @@ export async function updatePackageTemplateStatusAction(
 
     return { success: true, message: "Package status updated successfully" };
   } catch (error) {
+    console.error("Error updating package status:", error);
     return { success: false, message: "Failed to update package status" };
   }
 }
 
 export async function updatePackageTemplateAction(
   id: string,
-  formData: FormData
+  formData: FormData,
 ) {
   const name = formData.get("name") as string;
   const description = formData.get("description") as string;
@@ -175,7 +176,7 @@ export type AvailablePackageTemplate = Prisma.PromiseReturnType<
 >[number];
 
 export async function purchasePackegeAction(
-  packageTemplateId: string
+  packageTemplateId: string,
 ): Promise<{ success: boolean; message: string; orderId?: string }> {
   const session = await auth();
   const userId = session?.user?.id;
@@ -235,7 +236,7 @@ export async function purchasePackegeAction(
     }
 
     // 3. Create Order and PackagePurchase in a transaction (only if no active package found)
-    const { order, purchase } = await prisma.$transaction(async (tx) => {
+    const { order } = await prisma.$transaction(async (tx) => {
       // 3.1 Create the Order
       const createdOrder = await tx.order.create({
         data: {
@@ -335,7 +336,7 @@ export type UserOrder = Prisma.PromiseReturnType<
 >[number];
 
 export async function cancelPendingOrderAction(
-  orderId: string
+  orderId: string,
 ): Promise<{ success: boolean; message: string }> {
   const session = await auth();
   const userId = session?.user?.id;
@@ -414,11 +415,12 @@ export async function cancelPendingOrderAction(
     revalidatePath("/client/appointments"); // Update appointments list if one was cancelled
 
     return result;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error cancelling order:", error);
     return {
       success: false,
-      message: error.message || "Failed to cancel order.",
+      message:
+        error instanceof Error ? error.message : "Failed to cancel order.",
     };
   }
 }

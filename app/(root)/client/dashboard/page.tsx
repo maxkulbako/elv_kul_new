@@ -32,7 +32,7 @@ const ClientDashboardPage = async () => {
             Welcome back, {user?.name}
           </h1>
           <p className="text-muted-foreground">
-            Here's an overview of your therapy journey
+            Here&apos;s an overview of your therapy journey
           </p>
         </div>
 

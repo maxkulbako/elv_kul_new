@@ -7,14 +7,14 @@ const containerStyles = cn(
   "max-w-[1240px] mx-auto",
   "px-[32px] py-[60px]",
   "lg:px-[60px]",
-  "xl:py-[100px] xl:px-0"
+  "xl:py-[100px] xl:px-0",
 );
 
 const titleStyles = cn(
   "text-[28px] font-display text-center leading-[120%] tracking-[0%]]",
   "pb-[20px] border-b-[3px] border-olive-primary",
   "lg:max-w-[400px] lg:text-right lg:self-end",
-  "xl:text-[48px] xl:max-w-[650px]"
+  "xl:text-[48px] xl:max-w-[650px]",
 );
 
 const imageContainerStyles = cn(
@@ -22,7 +22,7 @@ const imageContainerStyles = cn(
   "self-center overflow-hidden",
   "shadow-olive",
   "lg:flex-shrink-0",
-  "xl:ml-[60px]"
+  "xl:ml-[60px]",
 );
 
 const Programs = () => {
@@ -57,8 +57,8 @@ const Programs = () => {
 
           {/* Title */}
           <h2 className={titleStyles}>
-            "Мої програми. <br className="hidden xl:block" /> Персональні та
-            групові"
+            &quot;Мої програми. <br className="hidden xl:block" /> Персональні
+            та групові&quot;
           </h2>
 
           {/* Image and Programs */}

@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function SignInClientLogic() {
-  const { data: session, status } = useSession();
+  const result = useSession();
+  const status = result.status;
   const router = useRouter();
 
   useEffect(() => {

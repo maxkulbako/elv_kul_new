@@ -69,7 +69,7 @@ const AdminDashboardPage: React.FC = async () => {
             <div>
               <h1 className="text-2xl font-semibold">Psychologist Dashboard</h1>
               <p className="text-muted-foreground">
-                Welcome back, Dr. {user?.name}. Here's an overview of your
+                Welcome back, Dr. {user?.name}. Here&apos;s an overview of your
                 practice.
               </p>
             </div>

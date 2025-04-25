@@ -9,7 +9,7 @@ import { Prisma } from "@prisma/client";
 
 export async function scheduleAppointment(
   _prevState: unknown,
-  formData: FormData
+  formData: FormData,
 ): Promise<{
   success: boolean;
   message: string;
@@ -23,7 +23,6 @@ export async function scheduleAppointment(
   if (!clientId) throw new Error("Unauthorized");
 
   const timeSlotId = formData.get("timeSlotId") as string | null;
-  const dateIso = formData.get("date") as string | null;
 
   if (!timeSlotId) {
     return { success: false, message: "Time slot ID is required" };
@@ -69,7 +68,7 @@ export async function scheduleAppointment(
     if (activePackage) {
       // 3. Package found: Create Appointment and update PackagePurchase in a transaction
       try {
-        const newAppointment = await prisma.$transaction(async (tx) => {
+        await prisma.$transaction(async (tx) => {
           // 3.1 Create Appointment
           const createdAppointment = await tx.appointment.create({
             data: {
@@ -133,7 +132,7 @@ export async function scheduleAppointment(
 
       // 4.1 Determine the price
       let finalPrice: Decimal | null = null;
-      let pricingType: "GLOBAL_SINGLE" | "CLIENT_SINGLE" | null = null;
+      //let pricingType: "GLOBAL_SINGLE" | "CLIENT_SINGLE" | null = null;
 
       // Check for client-specific price first
       const clientData = await prisma.user.findUnique({
@@ -146,7 +145,7 @@ export async function scheduleAppointment(
         clientData.clientSpecialPrice.greaterThan(0)
       ) {
         finalPrice = clientData.clientSpecialPrice;
-        pricingType = "CLIENT_SINGLE";
+        //pricingType = "CLIENT_SINGLE";
       } else {
         // If no client price, get global price
         const globalPriceData = await prisma.globalPricing.findFirst({
@@ -158,14 +157,14 @@ export async function scheduleAppointment(
           globalPriceData.singlePrice.greaterThan(0)
         ) {
           finalPrice = globalPriceData.singlePrice;
-          pricingType = "GLOBAL_SINGLE";
+          //pricingType = "GLOBAL_SINGLE";
         }
       }
 
       // Check if a price was determined
       if (!finalPrice) {
         console.error(
-          `Could not determine price for client ${clientId} and no active package.`
+          `Could not determine price for client ${clientId} and no active package.`,
         );
         return {
           success: false,
@@ -258,7 +257,7 @@ export async function scheduleAppointment(
          */
         // --- Placeholder until Stripe is integrated ---
         console.log(
-          `Order ${order.id} and Appointment ${appointment.id} created with PENDING status. Price: ${finalPrice}`
+          `Order ${order.id} and Appointment ${appointment.id} created with PENDING status. Price: ${finalPrice}`,
         );
 
         revalidatePath("/client/dashboard");
@@ -307,7 +306,7 @@ export async function scheduleAppointment(
 
 export async function cancelAppointment(
   _prevState: unknown,
-  formData: FormData
+  formData: FormData,
 ) {
   const appointmentId = formData.get("appointmentId") as string;
 
@@ -349,6 +348,7 @@ export async function cancelAppointment(
 
     return { success: true, message: "Appointment cancelled successfully" };
   } catch (error) {
+    console.error("Error cancelling appointment:", error);
     return {
       success: false,
       message: "Error cancelling appointment",
