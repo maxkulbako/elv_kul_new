@@ -14,19 +14,9 @@ export async function middleware(req: NextRequest) {
 
   const { pathname } = new URL(req.url);
 
-  console.log("[Cookies]", req.headers.get("cookie"));
-
-  console.log("[🔐 Middleware] url=", pathname, " role=", token?.role);
-  console.log("[🔐 Middleware] token:", token);
-
   if (!token) {
-    // NextResponse.rewrite will leave you on /admin/*, but put the /sign-in content
-    return NextResponse.rewrite(new URL("/sign-in", req.url));
+    return NextResponse.redirect(new URL("/sign-in", req.url));
   }
-
-  // if (!token) {
-  //   return NextResponse.redirect(new URL("/sign-in", req.url));
-  // }
 
   if (pathname.startsWith("/admin") && token.role !== "ADMIN") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));

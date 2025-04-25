@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import CallBackButton from "../shared/CallBackButton";
 import PriceCard from "./PriceCard";
 
@@ -6,13 +6,13 @@ const containerStyles = cn(
   "max-w-[1240px] mx-auto flex flex-col items-center justify-center gap-[60px]",
   "px-[32px] py-[60px]",
   "lg:px-[60px]",
-  "xl:py-[100px]"
+  "xl:py-[100px]",
 );
 
 const titleStyles = cn(
   "text-[28px] font-display text-center leading-[120%] tracking-[0%]] pb-[20px]",
   "border-b-[3px] border-olive-primary",
-  "xl:text-[48px]"
+  "xl:text-[48px]",
 );
 
 const Prices = () => {

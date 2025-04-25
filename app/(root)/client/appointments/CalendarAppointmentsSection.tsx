@@ -20,7 +20,7 @@ import {
 import { CalendarIcon, ChevronLeft, ChevronRight, Video } from "lucide-react";
 import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
 import { StatusBadge } from "./AppointmentsCard";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { AppointmentStatus } from "@prisma/client";
 import CancelAppointmentDialog from "@/components/shared/CancelAppointmentDialog";
 
@@ -52,7 +52,7 @@ export const CalendarAppointmentsSection = () => {
   }, []);
 
   const appointmentsForDay = appointments.filter((a) =>
-    isSameDay(new Date(a.date), selectedDate)
+    isSameDay(new Date(a.date), selectedDate),
   );
 
   const renderCalendarDays = () => {
@@ -62,7 +62,7 @@ export const CalendarAppointmentsSection = () => {
     for (let i = 0; i < 7; i++) {
       const day = addDays(startDate, i);
       const appointmentsOnDay = appointments.filter((a) =>
-        isSameDay(new Date(a.date), day)
+        isSameDay(new Date(a.date), day),
       );
 
       days.push(
@@ -73,7 +73,7 @@ export const CalendarAppointmentsSection = () => {
             isSameDay(day, new Date())
               ? "border-olive-primary bg-olive-primary/10"
               : "border-transparent hover:bg-olive-light",
-            appointmentsOnDay.length > 0 && "ring-1 ring-olive-primary"
+            appointmentsOnDay.length > 0 && "ring-1 ring-olive-primary",
           )}
           onClick={() => setSelectedDate(day)}
         >
@@ -81,7 +81,7 @@ export const CalendarAppointmentsSection = () => {
           <div
             className={cn(
               "flex items-center justify-center w-8 h-8 rounded-full",
-              isSameDay(day, selectedDate) && "bg-olive-primary text-white"
+              isSameDay(day, selectedDate) && "bg-olive-primary text-white",
             )}
           >
             {format(day, "d")}
@@ -89,7 +89,7 @@ export const CalendarAppointmentsSection = () => {
           {appointmentsOnDay.length > 0 && (
             <div className="mt-1 w-4 h-1 rounded-full bg-olive-primary"></div>
           )}
-        </div>
+        </div>,
       );
     }
 

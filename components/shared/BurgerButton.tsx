@@ -1,13 +1,13 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 const burgerButtonStyles = cn(
   "w-[25px] h-[22px]",
-  "xl:hidden cursor-pointer z-100 relative"
+  "xl:hidden cursor-pointer z-100 relative",
 );
 
 const burgerLineStyles = (
   isOpen: boolean,
-  position: "top" | "middle" | "bottom"
+  position: "top" | "middle" | "bottom",
 ) =>
   cn(
     "absolute left-0 w-full h-0.5 bg-white transition-all ease-in",
@@ -21,7 +21,7 @@ const burgerLineStyles = (
       "top-full",
       "duration-300",
       isOpen && "-translate-y-3.5 -rotate-45",
-    ]
+    ],
   );
 
 const BurgerButton = ({

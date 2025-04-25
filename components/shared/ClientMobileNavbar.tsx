@@ -5,7 +5,7 @@ import { User, Calendar, Settings, LogOut, Package } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { signOutUser } from "@/lib/actions/user.action";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { Session } from "next-auth";
 
 const burgerButtonStyles = cn(

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import Image from "next/image";
 import confidenceImage from "@/public/confidence_img_desk.webp";
 
@@ -8,7 +8,7 @@ const containerStyles = cn(
   "max-w-[1240px] mx-auto relative z-10 flex flex-col items-center justify-center gap-[32px]",
   "px-[32px] py-[60px]",
   "lg:px-[60px]",
-  "xl:py-[100px] xl:px-0"
+  "xl:py-[100px] xl:px-0",
 );
 
 const Confidence = () => {

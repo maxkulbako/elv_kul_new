@@ -27,7 +27,7 @@ export function combineDateAndTime(isoDate: string, timeString: string): Date {
 export const calculateSavings = (
   regularPrice: number,
   sessions: number,
-  packagePrice: number
+  packagePrice: number,
 ) => {
   const regularTotal = regularPrice * sessions;
   const savings = regularTotal - packagePrice;
