@@ -1,21 +1,18 @@
-import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ShoppingCart, Package, Receipt } from "lucide-react";
 import ActivePackageTab from "./ActivePackageTab";
 import AvailablePackagesTab from "./AvailablePackagesTab";
 import OrdersTab from "./OrdersTab";
-import { getAvailablePackages } from "@/lib/actions/price.action";
+import {
+  getAvailablePackages,
+  getOrdersByClientId,
+} from "@/lib/actions/price.action";
+import { auth } from "@/auth";
 
 const UserPackagesPage = async () => {
   const availablePackages = await getAvailablePackages();
+  const session = await auth();
+
+  const orders = await getOrdersByClientId(session?.user.id as string);
 
   return (
     <div className="flex-grow container py-8 mx-auto">
@@ -42,7 +39,7 @@ const UserPackagesPage = async () => {
         </TabsContent>
 
         <TabsContent value="orders">
-          <OrdersTab />
+          <OrdersTab orders={orders} />
         </TabsContent>
       </Tabs>
     </div>

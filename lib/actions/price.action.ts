@@ -290,3 +290,50 @@ export async function purchasePackegeAction(
     };
   }
 }
+
+export async function getOrdersByClientId(userId: string) {
+  if (!userId) {
+    throw new Error("User ID is required to fetch orders.");
+  }
+
+  const orders = await prisma.order.findMany({
+    where: {
+      userId: userId,
+    },
+    include: {
+      packagePurchase: {
+        include: {
+          packageTemplate: {
+            select: { name: true },
+          },
+        },
+      },
+      appointment: {
+        select: { date: true },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return orders.map((order) => ({
+    id: order.id,
+    createdAt: order.createdAt,
+    type: order.type,
+    amount: order.amount.toNumber(),
+    currency: order.currency,
+    status: order.status,
+    details:
+      order.type === "PACKAGE"
+        ? (order.packagePurchase?.packageTemplate?.name ?? "Package")
+        : order.type === "SINGLE_SESSION"
+          ? `Session on ${order.appointment ? new Date(order.appointment.date).toLocaleString() : "N/A"}`
+          : "Unknown Order",
+    paymentIntentId: order.paymentIntentId,
+  }));
+}
+
+export type UserOrder = Prisma.PromiseReturnType<
+  typeof getOrdersByClientId
+>[number];
