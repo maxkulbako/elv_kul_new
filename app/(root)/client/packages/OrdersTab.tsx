@@ -14,101 +14,209 @@ import {
   CircleDollarSign,
   Receipt,
   X,
+  XCircle,
+  RefreshCw,
+  Loader2,
+  CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { type UserOrder } from "@/lib/actions/price.action";
+import {
+  type UserOrder,
+  cancelPendingOrderAction,
+} from "@/lib/actions/price.action";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useState, useTransition } from "react";
 
 interface OrdersTabProps {
   orders: UserOrder[];
 }
 
-const getStatusColor = (status: string) => {
+const getStatusColor = (status: UserOrder["status"]) => {
   switch (status.toLowerCase()) {
-    case "succeeded":
-      return "text-green-600";
-    case "pending":
-      return "text-amber-600";
-    case "failed":
+    case "SUCCEEDED":
+      return "olive-primary";
+    case "PENDING":
+      return "text-yellow-600";
+    case "FAILED":
       return "text-red-600";
-    case "refunded":
-      return "text-gray-600";
+    case "REFUNDED":
+      return "text-olive-primary";
     default:
-      return "text-gray-600";
+      return "default";
   }
 };
 
-const getStatusIcon = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "succeeded":
-      return <Check className="h-4 w-4" />;
-    case "pending":
-      return <AlertTriangle className="h-4 w-4" />;
-    case "failed":
-      return <X className="h-4 w-4" />;
+const getStatusIcon = (status: UserOrder["status"]) => {
+  switch (status) {
+    case "PENDING":
+      return <RefreshCw className="h-4 w-4 mr-1 text-yellow-600" />;
+    case "SUCCEEDED":
+      return <CheckCircle className="h-4 w-4 mr-1 text-green-600" />;
+    case "FAILED":
+      return <AlertTriangle className="h-4 w-4 mr-1 text-red-600" />;
+    case "REFUNDED":
+      return <XCircle className="h-4 w-4 mr-1" />;
+    case "CANCELLED":
+      return <X className="h-4 w-4 mr-1" />;
     default:
       return null;
   }
 };
 
 const OrderActions = ({
-  status,
+  order, // Pass the whole order object
+  isCancelling, // Is *any* cancel action pending?
+  isCurrentOrderCancelling, // Is *this* order being cancelled?
   onPayNow,
-  onCancel,
+  onInitiateCancel, // Function to call when "Yes, Cancel" is clicked
   onRetry,
 }: {
-  status: string;
-  onPayNow: () => void;
-  onCancel: () => void;
-  onRetry: () => void;
+  order: UserOrder;
+  isCancelling: boolean;
+  isCurrentOrderCancelling: boolean;
+  onPayNow: (orderId: string) => void;
+  onInitiateCancel: (orderId: string) => void; // Renamed for clarity
+  onRetry: (orderId: string) => void;
 }) => {
-  switch (status.toLowerCase()) {
-    case "pending":
+  switch (order.status) {
+    case "PENDING":
       return (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 justify-end">
+          {" "}
+          {/* Use flex-wrap for smaller screens */}
           <Button
             size="sm"
             className="bg-olive-primary hover:bg-olive-primary/90"
-            onClick={onPayNow}
+            onClick={() => onPayNow(order.id)}
+            disabled={isCurrentOrderCancelling} // Disable if this order is being cancelled
           >
-            <CircleDollarSign className="mr-1" />
+            <CircleDollarSign className="mr-1 h-4 w-4" />
             Pay Now
           </Button>
-          <Button size="sm" variant="outline" onClick={onCancel}>
-            <X className="mr-1" />
-            Cancel Order
-          </Button>
+          {/* Add Confirmation Dialog around Cancel Button */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="sm" variant="outline" disabled={isCancelling}>
+                {isCurrentOrderCancelling ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <X className="mr-1 h-4 w-4" />
+                )}
+                Cancel Order
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently cancel
+                  your pending order for "{order.details}".
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isCurrentOrderCancelling}>
+                  Back
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => onInitiateCancel(order.id)} // Call the passed handler
+                  disabled={isCurrentOrderCancelling}
+                  className="bg-red-600 hover:bg-red-700" // Destructive style
+                >
+                  {isCurrentOrderCancelling ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : null}
+                  Yes, Cancel Order
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       );
-    case "succeeded":
+    case "SUCCEEDED":
       return (
-        <Button size="sm" variant="outline">
-          <Receipt className="mr-1" />
-          View Receipt
+        <Button size="sm" variant="outline" disabled={isCancelling}>
+          <Receipt className="mr-1 h-4 w-4" />
+          View Receipt {/* TODO: Add receipt functionality */}
         </Button>
       );
-    case "failed":
+    case "FAILED":
       return (
-        <div className="flex gap-2">
-          <Button
+        <div className="flex flex-wrap gap-2 justify-end">
+          {/* <Button
             size="sm"
             className="bg-olive-primary hover:bg-olive-primary/90"
-            onClick={onRetry}
+            onClick={() => onRetry(order.id)} // TODO: Add retry logic
+            disabled={isCancelling}
           >
-            <ArrowRight className="mr-1" />
+            <ArrowRight className="mr-1 h-4 w-4" />
             Retry Payment
-          </Button>
-          <Button size="sm" variant="outline" onClick={onCancel}>
-            <X className="mr-1" />
-            Cancel Order
+          </Button> */}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onInitiateCancel(order.id)}
+            disabled={isCancelling}
+          >
+            {/* Maybe don't allow cancelling failed orders directly? Or use a different action? */}
+            {/* For now, let's assume cancellation isn't primary for FAILED */}
+            {/* <X className="mr-1 h-4 w-4" /> Cancel Order */}
+            View Details {/* Placeholder */}
           </Button>
         </div>
       );
+    // Add cases for REFUNDED, CANCELLED if needed (usually no actions)
     default:
       return null;
   }
 };
 
 const OrdersTab = ({ orders }: OrdersTabProps) => {
+  const [isCancelPending, startCancelTransition] = useTransition();
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(
+    null
+  );
+
+  const handlePayNow = (orderId: string) => {
+    console.log(`Initiate payment for order: ${orderId}`);
+  };
+
+  const handleCancelOrder = (orderId: string) => {
+    setCancellingOrderId(orderId);
+
+    startCancelTransition(async () => {
+      try {
+        const result = await cancelPendingOrderAction(orderId);
+        if (result.success) {
+          toast.success(result.message || "Order cancelled successfully!", {
+            richColors: true,
+          });
+        } else {
+          toast.error(result.message || "Failed to cancel order.", {
+            richColors: true,
+          });
+        }
+      } catch (error) {
+        console.error("Cancellation transition error:", error);
+        toast.error("An unexpected error occurred during cancellation.", {
+          richColors: true,
+        });
+      } finally {
+        setCancellingOrderId(null);
+      }
+    });
+  };
+
   return (
     <>
       {orders.length > 0 ? (
@@ -155,14 +263,19 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
                       )}
                     </div>
                   </div>
+                  {/* Actions for the order */}
                   <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                     <div className="text-right">
                       <p className="font-semibold">${order.amount}</p>
                     </div>
                     <OrderActions
-                      status={order.status}
-                      onPayNow={() => console.log(order.id)}
-                      onCancel={() => console.log(order.id)}
+                      order={order}
+                      isCancelling={isCancelPending}
+                      isCurrentOrderCancelling={
+                        isCancelPending && cancellingOrderId === order.id
+                      }
+                      onPayNow={handlePayNow}
+                      onInitiateCancel={handleCancelOrder}
                       onRetry={() => console.log(order.id)}
                     />
                   </div>

@@ -58,6 +58,7 @@ enum OrderStatus {
   PENDING
   SUCCEEDED
   FAILED
+  CANCELLED
   REFUNDED
 }
 

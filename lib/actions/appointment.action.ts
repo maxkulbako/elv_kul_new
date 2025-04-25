@@ -264,7 +264,7 @@ export async function scheduleAppointment(
         revalidatePath("/client/dashboard");
         revalidatePath("/client/appointments");
         revalidatePath("/admin/calendar");
-        
+
         return {
           success: true,
           message:
@@ -272,8 +272,6 @@ export async function scheduleAppointment(
           requiresPayment: true,
           orderId: order.id,
         };
-
-        
       } catch (e) {
         console.error("Transaction failed for individual payment:", e);
         // Handle specific errors like unique constraint on slot again
@@ -371,10 +369,12 @@ export async function getCalendarAppointments() {
     },
   });
 
-  // Convert Decimal price to number
   return appointments.map((appointment) => ({
-    ...appointment,
-    price: Number(appointment.priceApplied),
+    id: appointment.id,
+    durationMin: appointment.durationMin,
+    status: appointment.status,
+    link: appointment.link,
+    date: appointment.date.toISOString(),
   }));
 }
 

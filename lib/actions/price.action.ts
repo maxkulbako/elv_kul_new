@@ -337,3 +337,92 @@ export async function getOrdersByClientId(userId: string) {
 export type UserOrder = Prisma.PromiseReturnType<
   typeof getOrdersByClientId
 >[number];
+
+export async function cancelPendingOrderAction(
+  orderId: string
+): Promise<{ success: boolean; message: string }> {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  if (!userId) {
+    return { success: false, message: "Unauthorized" };
+  }
+  if (!orderId) {
+    return { success: false, message: "Order ID is required." };
+  }
+
+  try {
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Find the order and verify ownership and status
+      const order = await tx.order.findUnique({
+        where: { id: orderId },
+        include: {
+          // Include related entities to know what needs cancelling
+          packagePurchase: { select: { id: true } },
+          appointment: { select: { id: true, availableSlotId: true } },
+        },
+      });
+
+      // Check if order exists and belongs to the user
+      if (!order) {
+        throw new Error("Order not found.");
+      }
+      if (order.userId !== userId) {
+        // TODO: Optional: Admins might be allowed to cancel, add role check if needed
+        throw new Error("You do not have permission to cancel this order.");
+      }
+
+      // Check if the order is actually pending
+      if (order.status !== "PENDING") {
+        throw new Error(`Cannot cancel order with status: ${order.status}`);
+      }
+
+      // 2. Update the Order status
+      await tx.order.update({
+        where: { id: orderId },
+        data: { status: "CANCELLED" },
+      });
+
+      // 3. Update related entities based on order type
+      if (order.type === "PACKAGE" && order.packagePurchase) {
+        // Cancel the related PackagePurchase
+        await tx.packagePurchase.update({
+          where: { id: order.packagePurchase.id },
+          data: { status: "CANCELLED" },
+        });
+      } else if (order.type === "SINGLE_SESSION" && order.appointment) {
+        // Cancel the related Appointment
+        await tx.appointment.update({
+          where: { id: order.appointment.id },
+          data: {
+            status: "CANCELLED",
+            availableSlotId: null,
+            updatedAt: new Date(),
+          },
+        });
+
+        // Free up the associated AvailableSlot if it exists
+        if (order.appointment.availableSlotId) {
+          await tx.availableSlot.update({
+            where: { id: order.appointment.availableSlotId },
+            data: { appointmentId: null }, // Remove the link
+          });
+        }
+      }
+
+      return { success: true, message: "Order cancelled successfully." };
+    }); // End of transaction
+
+    // 4. Revalidate paths after successful transaction
+    revalidatePath("/client/packages"); // Update orders list
+    revalidatePath("/client/appointments"); // Update appointments list if one was cancelled
+
+    return result;
+  } catch (error: any) {
+    console.error("Error cancelling order:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to cancel order.",
+    };
+  }
+}

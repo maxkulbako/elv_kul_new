@@ -21,29 +21,22 @@ import { CalendarIcon, ChevronLeft, ChevronRight, Video } from "lucide-react";
 import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
 import { StatusBadge } from "./AppointmentsCard";
 import { cn } from "@/lib/utils";
-import { PaymentStatus, PricingType, SessionStatus } from "@prisma/client";
+import { AppointmentStatus } from "@prisma/client";
 import CancelAppointmentDialog from "@/components/shared/CancelAppointmentDialog";
 
-type Appointment = {
+type CalendarAppointment = {
   id: string;
-  date: Date;
+  date: string;
   durationMin: number;
-  status: SessionStatus;
+  status: AppointmentStatus;
   link: string | null;
-  clientId: string;
-  adminId: string;
-  paymentStatus: PaymentStatus;
-  price: number;
-  pricingType: PricingType;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 export const CalendarAppointmentsSection = () => {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [appointments, setAppointments] = useState<CalendarAppointment[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedAppointment, setSelectedAppointment] =
-    useState<Appointment | null>(null);
+    useState<CalendarAppointment | null>(null);
 
   useEffect(() => {
     const loadAppointments = async () => {
