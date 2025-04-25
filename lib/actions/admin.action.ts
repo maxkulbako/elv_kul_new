@@ -50,7 +50,7 @@ export async function getAdminAppointments(
   // Convert Decimal to number for serialization
   return appointments.map((appointment) => ({
     ...appointment,
-    price: appointment.price ? Number(appointment.price) : null,
+    price: appointment.priceApplied ? Number(appointment.priceApplied) : null,
   }));
 }
 

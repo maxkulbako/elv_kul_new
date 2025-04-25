@@ -51,10 +51,7 @@ export async function getPackageTemplates() {
     ],
   });
 
-  return packageTemplates.map((template) => ({
-    ...template,
-    price: Number(template.price),
-  }));
+  return packageTemplates;
 }
 
 export async function createPackageTemplateAction(formData: FormData) {
