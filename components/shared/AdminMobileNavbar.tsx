@@ -24,7 +24,7 @@ const AdminMobileNavBar = ({ session }: { session: Session }) => {
           <nav className="flex flex-col p-4 space-y-4">
             <div className="flex items-center space-x-2 p-2 bg-olive-light rounded-md">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-olive-primary text-white">
-                {user?.name.charAt(0).toUpperCase()}
+                {user?.name?.charAt(0).toUpperCase()}
               </div>
               <div>
                 <p className="text-sm font-medium">{user?.name}</p>

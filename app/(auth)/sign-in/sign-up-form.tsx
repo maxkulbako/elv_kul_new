@@ -61,7 +61,7 @@ const CredentialsSignUpForm = () => {
   return (
     <form className="space-y-4 mt-4" onSubmit={handleSubmit(onSubmit)}>
       <div className="space-y-2">
-        <Label htmlFor="name">Ім'я</Label>
+        <Label htmlFor="name">Ім&apos;я</Label>
         <Input
           id="name"
           type="text"

@@ -20,9 +20,10 @@ const AvailablePackagesTab = ({
 }: {
   packages: AvailablePackageTemplate[];
 }) => {
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_isPurchasePending, startPurchaseTransition] = useTransition();
   const [pendingPurchaseId, setPendingPurchaseId] = useState<string | null>(
-    null
+    null,
   );
 
   const handlePurchasePackage = (packageId: string) => {

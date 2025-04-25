@@ -17,7 +17,7 @@ const Navbar = async () => {
     );
   }
 
-  const userRole: "CLIENT" | "ADMIN" = session.user?.role;
+  const userRole = session.user?.role;
 
   if (userRole === "ADMIN") {
     return (

@@ -69,7 +69,7 @@ const ActivePackageTab = () => {
           <CardContent className="p-6">
             <div className="text-center space-y-4">
               <Package className="h-12 w-12 mx-auto text-olive-primary" />
-              <p>You don't have any active package.</p>
+              <p>You don&apos;t have any active package.</p>
               <Button className="bg-olive-primary hover:bg-olive-primary/90">
                 Browse Available Packages
               </Button>

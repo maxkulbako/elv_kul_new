@@ -33,7 +33,7 @@ const CancelAppointmentDialog: React.FC<CancelAppointmentDialogProps> = ({
     if (state.success) {
       onSuccess();
     }
-  }, [state.success, isPending]);
+  }, [state.success, isPending, onSuccess]);
 
   return (
     <AlertDialog>

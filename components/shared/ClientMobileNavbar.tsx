@@ -6,15 +6,16 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { signOutUser } from "@/lib/actions/user.action";
 import { cn } from "@/lib/utils";
+import { Session } from "next-auth";
 
 const burgerButtonStyles = cn(
   "w-[25px] h-[22px]",
-  "xl:hidden cursor-pointer z-100 relative"
+  "xl:hidden cursor-pointer z-100 relative",
 );
 
 const burgerLineStyles = (
   isOpen: boolean,
-  position: "top" | "middle" | "bottom"
+  position: "top" | "middle" | "bottom",
 ) =>
   cn(
     "absolute left-0 w-full h-0.5 bg-white transition-all ease-in",
@@ -28,10 +29,10 @@ const burgerLineStyles = (
       "top-full",
       "duration-300",
       isOpen && "-translate-y-3.5 -rotate-45",
-    ]
+    ],
   );
 
-const ClientMobileNavBar = ({ session }: { session: any }) => {
+const ClientMobileNavBar = ({ session }: { session: Session }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -51,7 +52,7 @@ const ClientMobileNavBar = ({ session }: { session: any }) => {
           <nav className="flex flex-col p-4 space-y-4">
             <div className="flex items-center space-x-2 p-2 bg-olive-light rounded-md">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-olive-primary text-white">
-                {user?.name.charAt(0).toUpperCase()}
+                {user?.name?.charAt(0).toUpperCase()}
               </div>
               <div>
                 <p className="text-sm font-medium">{user?.name}</p>

@@ -31,7 +31,7 @@ const AppointmentsTab = ({ client }: { client: Client }) => {
                   </span>
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
-                  "Individual Therapy" • {appointment.durationMin}{" "}
+                  &quot;Individual Therapy&quot; • {appointment.durationMin}{" "}
                   {/* TODO: add appointment type */}
                   minutes
                 </div>
@@ -46,10 +46,10 @@ const AppointmentsTab = ({ client }: { client: Client }) => {
                   appointment.status === "COMPLETED"
                     ? "bg-green-100 text-green-800"
                     : appointment.status === "SCHEDULED"
-                    ? "bg-blue-100 text-blue-800"
-                    : appointment.status === "CANCELLED"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-800"
+                      ? "bg-blue-100 text-blue-800"
+                      : appointment.status === "CANCELLED"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-800"
                 }`}
               >
                 {appointment.status.charAt(0).toUpperCase() +

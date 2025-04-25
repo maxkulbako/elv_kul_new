@@ -9,7 +9,7 @@ import { endOfDay, startOfDay } from "date-fns";
 export async function getAdminAppointments(
   take?: number,
   year?: number,
-  month?: number
+  month?: number,
 ) {
   const session = await auth();
   if (!session?.user || session.user.role !== "ADMIN")
@@ -50,7 +50,7 @@ export async function getAdminAppointments(
   // Convert Decimal to number for serialization
   return appointments.map((appointment) => ({
     ...appointment,
-    price: appointment.price ? Number(appointment.price) : null,
+    price: appointment.priceApplied ? Number(appointment.priceApplied) : null,
   }));
 }
 
@@ -171,8 +171,8 @@ export const getClientById = async (id: string) => {
 };
 
 export async function createOrUpdateAvailableSlots(
-  _prevState: any,
-  formData: FormData
+  _prevState: unknown,
+  formData: FormData,
 ) {
   const session = await auth();
   const adminId = session?.user?.id;
@@ -186,7 +186,7 @@ export async function createOrUpdateAvailableSlots(
 
     // 2. Process each slot
     const timeSlots: TimeSlot[] = JSON.parse(
-      formData.get("timeSlots") as string
+      formData.get("timeSlots") as string,
     );
     const date: string = formData.get("date") as string;
 
@@ -214,7 +214,7 @@ export async function createOrUpdateAvailableSlots(
     });
 
     const existingDates = new Set(
-      existingSlots.map((slot) => slot.date.getTime())
+      existingSlots.map((slot) => slot.date.getTime()),
     );
 
     // 4. Check booked slots
@@ -236,12 +236,12 @@ export async function createOrUpdateAvailableSlots(
     // 5. Filter dates
     const datesToCreateFiltered = datesToCreate.filter(
       (date) =>
-        !existingDates.has(date.getTime()) && !bookedDates.has(date.getTime())
+        !existingDates.has(date.getTime()) && !bookedDates.has(date.getTime()),
     );
 
     const datesToDeleteFiltered = datesToDelete.filter(
       (date) =>
-        existingDates.has(date.getTime()) && !bookedDates.has(date.getTime())
+        existingDates.has(date.getTime()) && !bookedDates.has(date.getTime()),
     );
 
     // 6. Perform operations in a transaction
@@ -272,6 +272,7 @@ export async function createOrUpdateAvailableSlots(
       message: "Available slots updated successfully",
     };
   } catch (error) {
+    console.error("Failed to update available slots:", error);
     return {
       success: false,
       message: "Failed to update available slots",

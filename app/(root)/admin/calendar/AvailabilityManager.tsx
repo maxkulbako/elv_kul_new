@@ -51,7 +51,7 @@ export function AvailabilityManager() {
         prevSlots.map((slot) => ({
           ...slot,
           available: existingSlots.some((s) => s.time === slot.time),
-        }))
+        })),
       );
     };
 
@@ -61,8 +61,8 @@ export function AvailabilityManager() {
   const toggleTimeSlot = (time: string) => {
     setTimeSlots((slots) =>
       slots.map((slot) =>
-        slot.time === time ? { ...slot, available: !slot.available } : slot
-      )
+        slot.time === time ? { ...slot, available: !slot.available } : slot,
+      ),
     );
   };
 
@@ -99,7 +99,7 @@ export function AvailabilityManager() {
         <DialogHeader>
           <DialogTitle>Set Available Time Slots</DialogTitle>
           <DialogDescription>
-            Select dates and times when you're available for appointments
+            Select dates and times when you&apos;re available for appointments
           </DialogDescription>
         </DialogHeader>
 

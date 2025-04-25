@@ -39,6 +39,7 @@ export default function GlobalPriceSectionClient({ initialPrice }: Props) {
           });
         }
       } catch (error) {
+        console.error("Failed to update price:", error);
         toast.error("Failed to update price", {
           richColors: true,
         });
