@@ -175,8 +175,7 @@ export type AvailablePackageTemplate = Prisma.PromiseReturnType<
 >[number];
 
 export async function purchasePackegeAction(
-  _previousState: unknown,
-  formData: FormData
+  packageTemplateId: string
 ): Promise<{ success: boolean; message: string; orderId?: string }> {
   const session = await auth();
   const userId = session?.user?.id;
@@ -184,8 +183,6 @@ export async function purchasePackegeAction(
   if (!userId) {
     return { success: false, message: "Unauthorized" };
   }
-
-  const packageTemplateId = formData.get("packageTemplateId") as string | null;
 
   if (!packageTemplateId) {
     return { success: false, message: "Package Template ID is required." };
@@ -222,11 +219,10 @@ export async function purchasePackegeAction(
     }
     // --- End NEW CHECK ---
 
-    // 2. (Optional Check) Prevent buying if already have a PENDING purchase of the *same* template?
+    // 2. (Optional Check) Prevent buying if already have a PENDING purchase
     const pendingPurchase = await prisma.packagePurchase.findFirst({
       where: {
         clientId: userId,
-        packageTemplateId: packageTemplateId, // Check for the same template
         status: "PENDING",
       },
     });
@@ -234,7 +230,7 @@ export async function purchasePackegeAction(
       return {
         success: false,
         message:
-          "You already have a pending order for this package. Please complete or cancel it.",
+          "You already have a pending order for the package. Please complete or cancel it.",
       };
     }
 

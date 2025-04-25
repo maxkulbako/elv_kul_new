@@ -12,31 +12,44 @@ import {
   AvailablePackageTemplate,
   purchasePackegeAction,
 } from "@/lib/actions/price.action";
-import { useActionState, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
+
 const AvailablePackagesTab = ({
   packages,
 }: {
   packages: AvailablePackageTemplate[];
 }) => {
-  const [state, action, isPending] = useActionState(purchasePackegeAction, {
-    success: false,
-    message: "",
-  });
+  const [_isPurchasePending, startPurchaseTransition] = useTransition();
+  const [pendingPurchaseId, setPendingPurchaseId] = useState<string | null>(
+    null
+  );
 
-  useEffect(() => {
-    if (!state) return;
+  const handlePurchasePackage = (packageId: string) => {
+    setPendingPurchaseId(packageId);
 
-    if (state.success) {
-      toast.success(state.message || "Package added to orders!", {
-        richColors: true,
-      });
-    } else if (state.message) {
-      toast.error(state.message || "Failed to add package to orders.", {
-        richColors: true,
-      });
-    }
-  }, [state]);
+    startPurchaseTransition(async () => {
+      try {
+        const result = await purchasePackegeAction(packageId);
+        if (result.success) {
+          toast.success(result.message || "Package added to orders!", {
+            richColors: true,
+          });
+        } else {
+          toast.error(result.message || "Failed to add package to orders.", {
+            richColors: true,
+          });
+        }
+      } catch (error) {
+        console.error("Purchase transition error:", error);
+        toast.error("An unexpected error occurred during purchase.", {
+          richColors: true,
+        });
+      } finally {
+        setPendingPurchaseId(null);
+      }
+    });
+  };
 
   if (!packages || packages.length === 0) {
     return (
@@ -68,20 +81,16 @@ const AvailablePackagesTab = ({
                     Valid for {pkg.validDays} days
                   </p>
                 </div>
-                <form action={action}>
-                  <input
-                    type="hidden"
-                    name="packageTemplateId"
-                    value={pkg.id}
-                  />
-                  <Button
-                    className="bg-olive-primary hover:bg-olive-primary/90"
-                    type="submit"
-                    disabled={isPending}
-                  >
-                    {isPending ? "Processing..." : "Purchase Package"}
-                  </Button>
-                </form>
+
+                <Button
+                  className="bg-olive-primary hover:bg-olive-primary/90"
+                  onClick={() => handlePurchasePackage(pkg.id)}
+                  disabled={pendingPurchaseId === pkg.id}
+                >
+                  {pendingPurchaseId === pkg.id
+                    ? "Processing..."
+                    : "Purchase Package"}
+                </Button>
               </div>
             </div>
           </CardContent>
