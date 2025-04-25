@@ -388,6 +388,9 @@ export async function getClientAppointments() {
       date: {
         gte: new Date(),
       },
+      status: {
+        notIn: ["CANCELLED", "COMPLETED"],
+      },
     },
     orderBy: {
       date: "asc",
@@ -425,6 +428,9 @@ export async function getNextAppointment() {
       clientId: session.user.id,
       date: {
         gte: new Date(),
+      },
+      status: {
+        notIn: ["CANCELLED", "COMPLETED"],
       },
     },
     orderBy: {
