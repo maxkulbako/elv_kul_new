@@ -41,8 +41,8 @@ const About = () => {
 
           {/* Title */}
           <h2 className={titleStyles}>
-            "Усі відповіді уже в тобі. <br className="hidden xl:block" /> Я
-            тільки допоможу їх віднайти"
+            &quot;Усі відповіді уже в тобі. <br className="hidden xl:block" /> Я
+            тільки допоможу їх віднайти&quot;
           </h2>
 
           {/* Image */}
