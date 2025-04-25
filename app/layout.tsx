@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Poiret_One } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -15,7 +16,10 @@ const poiret = Poiret_One({
 });
 
 export const metadata: Metadata = {
-  title: "Elvida Kulbako",
+  title: {
+    default: "Elvida Kulbako",
+    template: "%s | Elvida Kulbako",
+  },
   description: "Elvida Kulbako",
 };
 
@@ -28,6 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${poiret.variable} ${montserrat.variable} antialiased`}>
         {children}
+        <Toaster />
       </body>
     </html>
   );
