@@ -8,11 +8,13 @@ export const config = {
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.AUTH_SECRET });
 
+  const { pathname } = new URL(req.url);
+
+  console.log("[🔐 Middleware] url=", pathname, " role=", token?.role);
+  console.log("[🔐 Middleware] token:", token);
   if (!token) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
-
-  const { pathname } = new URL(req.url);
 
   if (pathname.startsWith("/admin") && token.role !== "ADMIN") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
