@@ -240,7 +240,7 @@ export async function purchasePackegeAction(
           userId: userId,
           type: "PACKAGE",
           amount: packageTemplate.price,
-          currency: "USD", // TODO: Make configurable
+          currency: "UAH", // TODO: Make configurable
           status: "PENDING",
         },
       });

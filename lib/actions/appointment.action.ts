@@ -182,7 +182,7 @@ export async function scheduleAppointment(
               userId: clientId,
               type: "SINGLE_SESSION",
               amount: finalPrice as Decimal,
-              currency: "USD", // TODO: Or get from config/settings
+              currency: "UAH", // TODO: Or get from config/settings
               status: "PENDING",
               // paymentIntentId will be added after Stripe call
             },
