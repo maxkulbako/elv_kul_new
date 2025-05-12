@@ -21,11 +21,17 @@ const Footer = () => {
               alt="logo"
               fill
               className="object-contain"
-              sizes="44px"
+              sizes="(max-width: 1280px) 44px, 0px"
             />
           </div>
           <div className="relative w-[120px] h-[120px] hidden xl:block">
-            <Image src={logo} alt="logo" fill className="object-contain" />
+            <Image
+              src={logo}
+              alt="logo"
+              fill
+              className="object-contain"
+              sizes="(min-width: 1280px) 120px, 0px"
+            />
           </div>
           <div className="text-white text-[18px] text-center">
             <p>+38 098 123 45 67</p>
