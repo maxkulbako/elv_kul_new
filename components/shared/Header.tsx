@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import Navbar from "../shared/Navbar";
 
 const containerStyles = cn(
   "bg-olive-primary border-b-[1px] border-[#42412D]",
-  "relative z-50"
+  "relative z-50",
 );
 
 const headerStyles = cn(
@@ -13,7 +13,7 @@ const headerStyles = cn(
   "px-8 pt-9 pb-3",
   "md:py-4.5",
   "xl:px-[20px] xl:py-6",
-  "[@media(min-width:1330px)]:px-[0px]"
+  "[@media(min-width:1330px)]:px-[0px]",
 );
 
 const Header = () => {

@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import CallBackButton from "../shared/CallBackButton";
 import Image from "next/image";
 import additionalImage from "@/public/additional_img_desk.webp";
@@ -7,7 +7,7 @@ const containerStyles = cn(
   "max-w-[1240px] mx-auto",
   "px-[32px] py-[60px]",
   "lg:px-[60px]",
-  "xl:py-[100px] xl:px-0"
+  "xl:py-[100px] xl:px-0",
 );
 
 const imageContainerStyles = cn(
@@ -15,7 +15,7 @@ const imageContainerStyles = cn(
   "self-center overflow-hidden",
   "shadow-olive-revert",
   "lg:flex-shrink-0",
-  "xl:ml-[60px]"
+  "xl:ml-[60px]",
 );
 
 const Additional = () => {

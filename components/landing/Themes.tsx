@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import Image from "next/image";
 import themesImage from "@/public/themes_img_desk.webp";
 import questionImage from "@/public/questions_img_desk.webp";
@@ -9,21 +9,21 @@ const titleStyles = cn(
   "text-[28px] text-white font-display text-center leading-[120%] tracking-[0%]] pb-[20px]",
   "border-b-[3px] border-olive-primary",
   "lg:max-w-[400px] lg:text-left lg:self-start",
-  "xl:text-[48px] xl:max-w-[650px]"
+  "xl:text-[48px] xl:max-w-[650px]",
 );
 
 const questionTitleStyles = cn(
   "text-[28px] text-white font-display text-center leading-[120%] tracking-[0%]] pb-[20px]",
   "border-b-[3px] border-olive-primary",
   "lg:max-w-[400px] lg:text-right lg:self-end",
-  "xl:text-[48px] xl:max-w-[650px]"
+  "xl:text-[48px] xl:max-w-[650px]",
 );
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto relative z-10 flex flex-col items-center justify-center gap-[32px]",
   "px-[32px] py-[60px]",
   "lg:px-[60px]",
-  "xl:py-[100px] xl:px-0"
+  "xl:py-[100px] xl:px-0",
 );
 
 const themesData: string[] = [
@@ -85,14 +85,14 @@ const Themes = () => {
                     "shadow-[0px_2px_4px_0px_rgba(0,0,0,0.25)]",
                     "bg-white/15",
                     "backdrop-blur-[50px]",
-                    "py-[13px] md:py-4"
+                    "py-[13px] md:py-4",
                   )}
                 >
                   <p
                     className={cn(
                       "text-[10px] md:text-[18px]",
                       "font-medium md:font-semibold",
-                      "text-white text-center"
+                      "text-white text-center",
                     )}
                   >
                     {theme}
@@ -146,7 +146,7 @@ const Themes = () => {
                     "before:content-[url('/quotes.svg')]",
                     "before:absolute before:top-[50%] before:left-4",
                     "before:-translate-y-1/2",
-                    "before:opacity-50 before:scale-75"
+                    "before:opacity-50 before:scale-75",
                   )}
                 >
                   <p
@@ -155,7 +155,7 @@ const Themes = () => {
                       "font-medium lg:font-semibold",
                       "text-white text-center",
                       "break-words whitespace-normal",
-                      "pl-6"
+                      "pl-6",
                     )}
                   >
                     {question}

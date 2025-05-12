@@ -7,7 +7,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { calculateSavings } from "@/lib/utils";
+import { calculateSavings } from "@/lib/utils/utils";
 import { Package, Calendar, Edit } from "lucide-react";
 import { Decimal } from "@prisma/client/runtime/library";
 import PackageDisactiveDialog from "./PackageDisactiveDialog";

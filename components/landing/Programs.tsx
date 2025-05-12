@@ -1,6 +1,6 @@
 import Image from "next/image";
 import programsImage from "@/public/programs_img_desk.webp";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import ProgramCard from "./ProgramCard";
 
 const containerStyles = cn(

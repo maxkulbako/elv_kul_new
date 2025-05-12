@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 const CallBackButton = ({
   className,
@@ -17,7 +17,7 @@ const CallBackButton = ({
     <div
       className={cn(
         "w-[234px] h-[62px] xl:w-[264px] p-[6px] border-[0.5px] border-[#42412d] rounded-[100px]",
-        className
+        className,
       )}
     >
       <button

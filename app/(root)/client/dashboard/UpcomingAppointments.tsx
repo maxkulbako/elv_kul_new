@@ -58,12 +58,14 @@ export const UpcomingAppointments = async () => {
                   >
                     Reschedule
                   </Button>
-                  <Button
-                    size="sm"
-                    className="bg-olive-primary hover:bg-olive-primary/90"
-                  >
-                    Join Session
-                  </Button>
+                  <Link href={`/videocall/${appointment.id}`}>
+                    <Button
+                      size="sm"
+                      className="bg-olive-primary hover:bg-olive-primary/90"
+                    >
+                      Join Session
+                    </Button>
+                  </Link>
                 </div>
               </div>
             ))}

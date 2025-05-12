@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, HTMLMotionProps } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 
 type PriceCardProps = HTMLMotionProps<"div"> & {
   price: number;
@@ -23,7 +23,7 @@ const PriceCard = ({
     <motion.div
       className={cn(
         "w-full min-h-[220px] lg:flex-1 max-w-[350px] flex flex-col items-center justify-between rounded-[8px] border-[3px]",
-        isHighlighted ? "border-olive-primary" : "border-[#E6EAD8]"
+        isHighlighted ? "border-olive-primary" : "border-[#E6EAD8]",
       )}
       {...motionProps}
     >

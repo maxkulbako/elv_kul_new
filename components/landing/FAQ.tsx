@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Arrow from "@/public/arrow.svg";
@@ -8,14 +8,14 @@ import Image from "next/image";
 
 const sectionStyles = cn(
   "max-w-[1440px] mx-auto bg-olive-primary",
-  "gap-8 w-full"
+  "gap-8 w-full",
 );
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto flex flex-col items-center justify-center gap-[32px] ",
   "px-[32px] py-[60px]",
   "lg:px-[60px]",
-  "xl:py-[100px] xl:px-0"
+  "xl:py-[100px] xl:px-0",
 );
 
 const faqItems: { question: string; answer: string }[] = [

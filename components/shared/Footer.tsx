@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utils";
 import Image from "next/image";
 import smallLogo from "@/public/small_logo.svg";
 import logo from "@/public/logo.png";
@@ -7,7 +7,7 @@ import { Icons } from "../shared/icons";
 const containerStyles = cn(
   "max-w-[1240px] mx-auto flex flex-col items-center justify-center gap-[60px]",
   "px-[32px] py-[60px]",
-  "lg:px-[60px]"
+  "lg:px-[60px]",
 );
 
 const Footer = () => {
@@ -21,11 +21,17 @@ const Footer = () => {
               alt="logo"
               fill
               className="object-contain"
-              sizes="44px"
+              sizes="(max-width: 1280px) 44px, 0px"
             />
           </div>
           <div className="relative w-[120px] h-[120px] hidden xl:block">
-            <Image src={logo} alt="logo" fill className="object-contain" />
+            <Image
+              src={logo}
+              alt="logo"
+              fill
+              className="object-contain"
+              sizes="(min-width: 1280px) 120px, 0px"
+            />
           </div>
           <div className="text-white text-[18px] text-center">
             <p>+38 098 123 45 67</p>
