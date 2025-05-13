@@ -58,14 +58,37 @@ export const UpcomingAppointments = async () => {
                   >
                     Reschedule
                   </Button>
-                  <Link href={`/videocall/${appointment.id}`}>
-                    <Button
-                      size="sm"
-                      className="bg-olive-primary hover:bg-olive-primary/90"
+                  {appointment.status === "PAID" ||
+                  appointment.status === "PAID_FROM_PACKAGE" ? (
+                    <Link href={`/videocall/${appointment.id}`}>
+                      <Button
+                        size="sm"
+                        className="bg-olive-primary hover:bg-olive-primary/90"
+                      >
+                        Join Session
+                      </Button>
+                    </Link>
+                  ) : appointment.orderId ? (
+                    <Link
+                      href={`/client/packages?orderId=${appointment.orderId}`}
                     >
-                      Join Session
-                    </Button>
-                  </Link>
+                      <Button
+                        size="sm"
+                        className="bg-olive-primary hover:bg-olive-primary/90"
+                      >
+                        Pay Now
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/client/packages">
+                      <Button
+                        size="sm"
+                        className="bg-olive-primary hover:bg-olive-primary/90"
+                      >
+                        Browse Packages
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}

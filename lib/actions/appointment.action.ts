@@ -398,6 +398,13 @@ export async function getClientAppointments() {
         notIn: ["CANCELLED", "COMPLETED"],
       },
     },
+    select: {
+      id: true,
+      date: true,
+      durationMin: true,
+      status: true,
+      orderId: true,
+    },
     orderBy: {
       date: "asc",
     },

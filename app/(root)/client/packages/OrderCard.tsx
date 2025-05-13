@@ -2,6 +2,7 @@ import React from "react";
 import { type UserOrder } from "@/lib/actions/price.action";
 import { OrderStatus } from "./OrderStatus";
 import { OrderActions } from "./OrderActions";
+import { cn } from "@/lib/utils/utils";
 
 interface OrderCardProps {
   order: UserOrder;
@@ -9,6 +10,7 @@ interface OrderCardProps {
   isCurrentOrderCancelling: boolean;
   onPayNow: (orderId: string) => void;
   onInitiateCancel: (orderId: string) => void;
+  highlight?: boolean;
   // onRetry?: (orderId: string) => void; // TODO: Add retry functionality
 }
 
@@ -18,6 +20,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({
   isCurrentOrderCancelling,
   onPayNow,
   onInitiateCancel,
+  highlight = false,
   // onRetry,
 }) => {
   const formatDate = (dateString: string | Date) => {
@@ -36,8 +39,10 @@ export const OrderCard: React.FC<OrderCardProps> = ({
 
   return (
     <div
-      key={order.id}
-      className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-olive-light rounded-lg gap-4"
+      className={cn(
+        "flex flex-col md:flex-row md:items-center justify-between p-4 bg-olive-light rounded-lg gap-4",
+        highlight && "border-olive-primary bg-olive-light",
+      )}
     >
       <div className="space-y-2 flex-grow">
         <div className="flex items-center gap-3 flex-wrap">

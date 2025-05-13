@@ -8,7 +8,11 @@ import {
 } from "@/lib/actions/price.action";
 import { auth } from "@/auth";
 
-const UserPackagesPage = async () => {
+const UserPackagesPage = async ({
+  searchParams,
+}: {
+  searchParams: { orderId?: string };
+}) => {
   const availablePackages = await getAvailablePackages();
   const session = await auth();
 
@@ -23,7 +27,10 @@ const UserPackagesPage = async () => {
         </p>
       </div>
 
-      <Tabs defaultValue="active" className="space-y-4">
+      <Tabs
+        defaultValue={searchParams.orderId ? "orders" : "active"}
+        className="space-y-4"
+      >
         <TabsList>
           <TabsTrigger value="active">Active Package</TabsTrigger>
           <TabsTrigger value="available">Available Packages</TabsTrigger>
