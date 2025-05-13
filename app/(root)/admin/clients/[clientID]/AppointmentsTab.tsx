@@ -3,11 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import { format } from "date-fns";
 import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
-
+import AppointmentStatusForm from "./AppointmentStatusForm";
 import { type Client } from "./page";
 
 const AppointmentsTab = ({ client }: { client: Client }) => {
-  console.log(client);
   return (
     <Card>
       <CardHeader>
@@ -45,20 +44,10 @@ const AppointmentsTab = ({ client }: { client: Client }) => {
               </div>
             )} */}
               </div>
-              <div
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  appointment.status === "COMPLETED"
-                    ? "bg-green-100 text-green-800"
-                    : appointment.status === "SCHEDULED"
-                      ? "bg-blue-100 text-blue-800"
-                      : appointment.status === "CANCELLED"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {appointment.status.charAt(0).toUpperCase() +
-                  appointment.status.slice(1)}
-              </div>
+              <AppointmentStatusForm
+                initialStatus={appointment.status}
+                appointmentId={appointment.id}
+              />
             </div>
           ))}
         </div>

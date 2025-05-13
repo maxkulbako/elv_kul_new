@@ -27,6 +27,7 @@ enum AppointmentStatus {
   COMPLETED
   CANCELLED
   RESCHEDULED
+  COMPLETED_AND_REFUNDED
 }
 
 enum PaymentMethod {
@@ -137,6 +138,7 @@ model Order {
   status          OrderStatus @default(PENDING)
   paymentIntentId String?     @unique
   paidAt          DateTime?
+  refundAt        DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -41,7 +41,7 @@ const UpcomingSessionsSection = async () => {
                 <Link href={`/admin/clients/${appointment.clientId}`}>
                   <User className="h-5 w-5 text-olive-primary mr-2 cursor-pointer" />
                 </Link>
-                <Link href={`/admin/sessions/${appointment.id}`}>
+                <Link href={`/videocall/${appointment.id}`}>
                   <Video className="h-5 w-5 text-olive-primary cursor-pointer" />
                 </Link>
               </div>

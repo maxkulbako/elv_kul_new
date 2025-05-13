@@ -83,8 +83,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ initialDates }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <Card className="col-span-1">
+          <div className="flex gap-8">
+            <Card className="col-span-1 w-[350px]">
               <CardHeader>
                 <CardTitle>Select Date</CardTitle>
               </CardHeader>
@@ -107,7 +107,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ initialDates }) => {
               </CardContent>
             </Card>
 
-            <Card className="lg:col-span-2">
+            <Card className="lg:col-span-2 w-[calc(100%-350px)]">
               <CardHeader>
                 <CardTitle>
                   {selectedDate
@@ -152,15 +152,18 @@ const CalendarView: React.FC<CalendarViewProps> = ({ initialDates }) => {
                               Profile
                             </Link>
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="bg-olive-primary text-white"
-                            onClick={() => handleStartSession(session)}
-                          >
-                            <Video className="h-4 w-4 mr-2" />
-                            Join
-                          </Button>
+
+                          <Link href={`/videocall/${session.id}`}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="bg-olive-primary text-white"
+                              onClick={() => handleStartSession(session)}
+                            >
+                              <Video className="h-4 w-4 mr-2" />
+                              Join
+                            </Button>
+                          </Link>
                         </div>
                       </div>
                     ))}

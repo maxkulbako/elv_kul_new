@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 
 import { TimeSlot } from "@/app/(root)/admin/calendar/AvailabilityManager";
 import { endOfDay, startOfDay } from "date-fns";
+import { AppointmentStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export async function getAdminAppointments(
   take?: number,
@@ -46,6 +48,7 @@ export async function getAdminAppointments(
       },
     },
   });
+  console.log(appointments);
 
   // Convert Decimal to number for serialization
   return appointments.map((appointment) => ({
@@ -165,13 +168,8 @@ export const getClientById = async (id: string) => {
         },
       },
       appointments: {
-        where: {
-          date: {
-            gte: new Date(),
-          },
-        },
         orderBy: {
-          date: "asc",
+          date: "desc",
         },
         select: {
           id: true,
@@ -348,7 +346,9 @@ export async function getAdminAppointmentsDates(year: number, month: number) {
         gte: startDate,
         lte: endDate,
       },
-      status: "SCHEDULED",
+      status: {
+        notIn: ["CANCELLED", "RESCHEDULED"],
+      },
     },
     select: {
       date: true,
@@ -377,7 +377,9 @@ export async function getAdminAppointmentsByDate(date: Date) {
         gte: startOfDay,
         lte: endOfDay,
       },
-      status: "SCHEDULED",
+      status: {
+        notIn: ["CANCELLED", "RESCHEDULED"],
+      },
     },
     select: {
       id: true,
@@ -398,4 +400,37 @@ export async function getAdminAppointmentsByDate(date: Date) {
     clientName: appointment.client.name || "Unknown Client",
     type: "Individual Therapy", //TODO: add type to appointment model
   }));
+}
+
+export async function updateAppointmentStatus(
+  appointmentId: string,
+  status: AppointmentStatus,
+) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  try {
+    await prisma.appointment.update({
+      where: {
+        id: appointmentId,
+      },
+      data: {
+        status,
+      },
+    });
+
+    revalidatePath("/admin/calendar");
+
+    return {
+      success: true,
+      message: "Appointment status updated successfully",
+    };
+  } catch (error) {
+    console.error("Failed to update appointment status:", error);
+    return {
+      success: false,
+      message: "Failed to update appointment status",
+    };
+  }
 }
