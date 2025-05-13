@@ -2,18 +2,22 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 import { format } from "date-fns";
+import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
 
 import { type Client } from "./page";
 
 const AppointmentsTab = ({ client }: { client: Client }) => {
+  console.log(client);
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Appointment History</CardTitle>
-          <Button className="bg-olive-primary hover:bg-olive-primary/90">
-            Schedule New
-          </Button>
+          <ScheduleAppointmentClientWrapper>
+            <Button className="bg-olive-primary hover:bg-olive-primary/90">
+              Schedule New
+            </Button>
+          </ScheduleAppointmentClientWrapper>
         </div>
       </CardHeader>
       <CardContent>

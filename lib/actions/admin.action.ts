@@ -54,6 +54,33 @@ export async function getAdminAppointments(
   }));
 }
 
+export async function getUpcommingAppointments(numberOfAppointments: number) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      adminId: session.user.id,
+      date: {
+        gte: new Date(),
+      },
+    },
+    orderBy: {
+      date: "asc",
+    },
+    take: numberOfAppointments,
+    include: {
+      client: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  return appointments;
+}
+
 export async function getAllClients(query: string = "") {
   const session = await auth();
   if (!session?.user || session.user.role !== "ADMIN")
