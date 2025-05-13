@@ -25,6 +25,15 @@ import {
 } from "@/lib/actions/appointment.action";
 import { useActionState } from "react";
 import { toast } from "sonner";
+import { getAdminClients } from "@/lib/actions/admin.action";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "../ui/label";
 
 type ScheduleAppointmentDialogProps = {
   isOpen: boolean;
@@ -32,11 +41,18 @@ type ScheduleAppointmentDialogProps = {
   isRescheduling?: boolean;
   appointmentId?: string;
   onSuccess?: () => void;
+  isAdmin?: boolean;
 };
 
 type TimeSlot = {
   timeSlotId: string;
   time: string;
+};
+
+type Client = {
+  id: string;
+  name: string | null;
+  email: string | null;
 };
 
 const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
@@ -45,6 +61,7 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
   isRescheduling = false,
   appointmentId,
   onSuccess,
+  isAdmin = false,
 }) => {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
@@ -52,11 +69,28 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
     TimeSlot | undefined
   >(undefined);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
 
   const [state, action, isPending] = useActionState(scheduleAppointment, {
     success: false,
     message: "",
   });
+
+  useEffect(() => {
+    if (isAdmin) {
+      const fetchClients = async () => {
+        try {
+          const clientsList = await getAdminClients();
+          setClients(clientsList);
+        } catch (error) {
+          console.error("Failed to fetch clients:", error);
+          toast.error("Failed to load clients list");
+        }
+      };
+      fetchClients();
+    }
+  }, [isAdmin]);
 
   const handleDateSelect = async (selectedDate: Date | undefined) => {
     setDate(selectedDate);
@@ -90,8 +124,17 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
       return;
     }
 
+    if (isAdmin && !selectedClientId) {
+      toast.error("Please select a client");
+      return;
+    }
+
     if (appointmentId) {
       formData.set("appointmentId", appointmentId);
+    }
+
+    if (isAdmin) {
+      formData.set("clientId", selectedClientId);
     }
 
     formData.set("date", date.toISOString());
@@ -115,6 +158,28 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
         </DialogHeader>
 
         <form action={handleSubmit} className="flex flex-col gap-4">
+          {isAdmin && (
+            <div className="grid gap-2">
+              <Label className="text-sm font-medium">Client</Label>
+              <Select
+                value={selectedClientId}
+                onValueChange={setSelectedClientId}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a client" />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name || "Unnamed Client"}{" "}
+                      {client.email ? `(${client.email})` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="grid gap-2">
             <label className="text-sm font-medium">Date</label>
             <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
@@ -191,7 +256,12 @@ const ScheduleAppointmentDialog: React.FC<ScheduleAppointmentDialogProps> = ({
             <Button
               className="bg-olive-primary hover:bg-olive-primary/90"
               type="submit"
-              disabled={!date || !selectedTimeSlot || isPending}
+              disabled={
+                !date ||
+                !selectedTimeSlot ||
+                (isAdmin && !selectedClientId) ||
+                isPending
+              }
             >
               {isPending
                 ? "Scheduling..."

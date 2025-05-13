@@ -18,11 +18,17 @@ export async function scheduleAppointment(
   orderId?: string;
 }> {
   const session = await auth();
-  const clientId = session?.user?.id;
+  if (!session?.user) throw new Error("Unauthorized");
 
-  if (!clientId) throw new Error("Unauthorized");
+  const timeSlotId = formData.get("timeSlotId") as string;
+  const clientId = formData.get("clientId") as string | undefined;
 
-  const timeSlotId = formData.get("timeSlotId") as string | null;
+  // If clientId is provided (admin scheduling), use it, otherwise use the current user's ID
+  const targetClientId = clientId || session.user.id;
+
+  if (!targetClientId) {
+    throw new Error("Client ID is required");
+  }
 
   if (!timeSlotId) {
     return { success: false, message: "Time slot ID is required" };
@@ -56,7 +62,7 @@ export async function scheduleAppointment(
     const now = new Date();
     const activePackage = await prisma.packagePurchase.findFirst({
       where: {
-        clientId: clientId,
+        clientId: targetClientId,
         status: "ACTIVE",
         sessionsUsed: { lt: prisma.packagePurchase.fields.sessionsTotal },
         endDate: { gte: startOfDay(now) },
@@ -74,7 +80,7 @@ export async function scheduleAppointment(
             data: {
               date: availableSlot.date,
               durationMin: 50, // TODO: Think about it
-              clientId: clientId,
+              clientId: targetClientId,
               adminId: adminId,
               status: "PAID_FROM_PACKAGE",
               priceApplied: new Decimal(0),
@@ -136,7 +142,7 @@ export async function scheduleAppointment(
 
       // Check for client-specific price first
       const clientData = await prisma.user.findUnique({
-        where: { id: clientId },
+        where: { id: targetClientId },
         select: { clientSpecialPrice: true },
       });
 
@@ -164,7 +170,7 @@ export async function scheduleAppointment(
       // Check if a price was determined
       if (!finalPrice) {
         console.error(
-          `Could not determine price for client ${clientId} and no active package.`,
+          `Could not determine price for client ${targetClientId} and no active package.`,
         );
         return {
           success: false,
@@ -179,7 +185,7 @@ export async function scheduleAppointment(
           // Create Order first
           const createdOrder = await tx.order.create({
             data: {
-              userId: clientId,
+              userId: targetClientId,
               type: "SINGLE_SESSION",
               amount: finalPrice as Decimal,
               currency: "UAH", // TODO: Or get from config/settings
@@ -193,7 +199,7 @@ export async function scheduleAppointment(
             data: {
               date: availableSlot.date,
               durationMin: availableSlot.duration,
-              clientId: clientId,
+              clientId: targetClientId,
               adminId: adminId,
               status: "PENDING_PAYMENT",
               priceApplied: finalPrice as Decimal,
@@ -224,7 +230,7 @@ export async function scheduleAppointment(
                 metadata: {
                     orderId: order.id,
                     appointmentId: appointment.id,
-                    userId: clientId,
+                    userId: targetClientId,
                 },
                 // Add customer ID if you manage customers in Stripe
                 // customer: stripeCustomerId,

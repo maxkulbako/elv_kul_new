@@ -13,6 +13,7 @@ import {
   getAdminAppointmentsByDate,
 } from "@/lib/actions/admin.action";
 import { AppointmentStatus } from "@prisma/client";
+import ScheduleDialogClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
 
 interface Session {
   id: string;
@@ -77,6 +78,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ initialDates }) => {
               <p className="text-muted-foreground">
                 Manage your appointments and schedule
               </p>
+            </div>
+            <div>
+              <ScheduleDialogClientWrapper isAdmin>
+                <Button>Schedule Appointment</Button>
+              </ScheduleDialogClientWrapper>
             </div>
             <div>
               <AvailabilityManager />

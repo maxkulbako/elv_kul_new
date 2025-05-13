@@ -8,11 +8,13 @@ const ScheduleDialogClientWrapper = ({
   isRescheduling = false,
   appointmentId,
   onSuccess,
+  isAdmin = false,
 }: {
   children: React.ReactNode;
   isRescheduling?: boolean;
   appointmentId?: string;
   onSuccess?: () => void;
+  isAdmin?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -26,6 +28,7 @@ const ScheduleDialogClientWrapper = ({
         isRescheduling={isRescheduling}
         appointmentId={appointmentId}
         onSuccess={onSuccess}
+        isAdmin={isAdmin}
       />
     </>
   );

@@ -434,3 +434,25 @@ export async function updateAppointmentStatus(
     };
   }
 }
+
+export async function getAdminClients() {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  const clients = await prisma.user.findMany({
+    where: {
+      role: "CLIENT",
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  return clients;
+}
