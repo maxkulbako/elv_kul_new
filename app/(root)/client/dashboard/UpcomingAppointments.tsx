@@ -12,6 +12,45 @@ import Link from "next/link";
 import { CalendarPlus, ChevronRight } from "lucide-react";
 import ScheduleAppointmentClientWrapper from "@/components/shared/ScheduleAppointmentClientWrapper";
 
+type UpcomingAppointment = Awaited<
+  ReturnType<typeof getClientAppointments>
+>[number];
+
+const appointmentStatusActions = (appointment: UpcomingAppointment) => {
+  const { status, orderId } = appointment;
+  let href = null;
+  let buttonText = null;
+
+  switch (status) {
+    case "PAID":
+      href = `/videocall/${appointment.id}`;
+      buttonText = "Join Session";
+      break;
+    case "PAID_FROM_PACKAGE":
+      href = `/videocall/${appointment.id}`;
+      buttonText = "Join Session";
+      break;
+    case "PENDING_PAYMENT":
+      href = `/client/orders/${orderId}`;
+      buttonText = "View Order";
+      break;
+    case "PAYMENT_FAILED":
+      href = `/client/orders/${orderId}`;
+      buttonText = "View Orders";
+      break;
+    default:
+      href = "/client/packages";
+      buttonText = "View Orders";
+  }
+  return (
+    <Link href={href}>
+      <Button size="sm" className="bg-olive-primary hover:bg-olive-primary/90">
+        {buttonText}
+      </Button>
+    </Link>
+  );
+};
+
 export const UpcomingAppointments = async () => {
   const upcomingAppointments = await getClientAppointments();
 
@@ -58,37 +97,7 @@ export const UpcomingAppointments = async () => {
                   >
                     Reschedule
                   </Button>
-                  {appointment.status === "PAID" ||
-                  appointment.status === "PAID_FROM_PACKAGE" ? (
-                    <Link href={`/videocall/${appointment.id}`}>
-                      <Button
-                        size="sm"
-                        className="bg-olive-primary hover:bg-olive-primary/90"
-                      >
-                        Join Session
-                      </Button>
-                    </Link>
-                  ) : appointment.orderId ? (
-                    <Link
-                      href={`/client/packages?orderId=${appointment.orderId}`}
-                    >
-                      <Button
-                        size="sm"
-                        className="bg-olive-primary hover:bg-olive-primary/90"
-                      >
-                        Pay Now
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Link href="/client/packages">
-                      <Button
-                        size="sm"
-                        className="bg-olive-primary hover:bg-olive-primary/90"
-                      >
-                        Browse Packages
-                      </Button>
-                    </Link>
-                  )}
+                  {appointmentStatusActions(appointment)}
                 </div>
               </div>
             ))}

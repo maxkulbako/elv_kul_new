@@ -328,6 +328,21 @@ export async function getOrdersByClientId(userId: string) {
   }));
 }
 
+export async function getOrderDetailsById(orderId: string) {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      packagePurchase: {
+        include: {
+          packageTemplate: true,
+        },
+      },
+      appointment: true,
+    },
+  });
+  return order;
+}
+
 export type UserOrder = Prisma.PromiseReturnType<
   typeof getOrdersByClientId
 >[number];

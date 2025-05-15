@@ -3,12 +3,14 @@ import { type UserOrder } from "@/lib/actions/price.action";
 import { OrderStatus } from "./OrderStatus";
 import { OrderActions } from "./OrderActions";
 import { cn } from "@/lib/utils/utils";
+import { Button } from "@/components/ui/button";
+import { EyeIcon } from "lucide-react";
+import Link from "next/link";
 
 interface OrderCardProps {
   order: UserOrder;
   isCancelling: boolean;
   isCurrentOrderCancelling: boolean;
-  onPayNow: (orderId: string) => void;
   onInitiateCancel: (orderId: string) => void;
   highlight?: boolean;
   // onRetry?: (orderId: string) => void; // TODO: Add retry functionality
@@ -18,7 +20,6 @@ export const OrderCard: React.FC<OrderCardProps> = ({
   order,
   isCancelling,
   isCurrentOrderCancelling,
-  onPayNow,
   onInitiateCancel,
   highlight = false,
   // onRetry,
@@ -68,10 +69,14 @@ export const OrderCard: React.FC<OrderCardProps> = ({
             order={order}
             isCancelling={isCancelling}
             isCurrentOrderCancelling={isCurrentOrderCancelling}
-            onPayNow={onPayNow}
             onInitiateCancel={onInitiateCancel}
             // onRetry={onRetry}
           />
+          <Link href={`/client/orders/${order.id}`}>
+            <Button variant="outline" className="mt-2 w-full">
+              <EyeIcon className="w-4 h-4" /> Details
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

@@ -23,11 +23,16 @@ export type WayForPayFormParams = {
   serviceUrl: string;
 };
 
-export async function getWayForPayPaymentFormParams(orderId: string) {
+export async function getWayForPayPaymentFormParams(
+  _previosData: unknown,
+  formData: FormData,
+) {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, message: "Unauthorized" };
   }
+
+  const orderId = formData.get("orderId");
 
   if (!orderId) {
     return { success: false, message: "Order ID is required." };
@@ -39,7 +44,7 @@ export async function getWayForPayPaymentFormParams(orderId: string) {
   }
 
   const order = await prisma.order.findUnique({
-    where: { id: orderId },
+    where: { id: orderId as string },
     include: {
       packagePurchase: {
         include: { packageTemplate: { select: { name: true } } },

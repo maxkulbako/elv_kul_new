@@ -14,10 +14,8 @@ import {
   cancelPendingOrderAction,
 } from "@/lib/actions/price.action";
 import { toast } from "sonner";
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { OrderCard } from "./OrderCard";
-import { redirectToWayForPay } from "@/lib/utils/payments";
-import { getWayForPayPaymentFormParams } from "@/lib/actions/payments/wayforpay";
 import { useSearchParams } from "next/navigation";
 
 interface OrdersTabProps {
@@ -32,22 +30,6 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(
     null,
   );
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isPayPending, startPayTransition] = useTransition();
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [payingOrderId, setPayingOrderId] = useState<string | null>(null);
-
-  useEffect(() => {
-    console.log("orderId", orderId);
-    if (orderId) {
-      const order = orders.find((o) => o.id === orderId);
-      if (order && order.status === "PENDING") {
-        // Автоматично запускаємо оплату для цього ордеру
-        handlePayNow(orderId);
-      }
-    }
-  }, [orderId, orders]);
 
   const handleCancelOrder = (orderId: string) => {
     setCancellingOrderId(orderId);
@@ -75,36 +57,6 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
     });
   };
 
-  const handlePayNow = (orderId: string) => {
-    setPayingOrderId(orderId);
-    startPayTransition(async () => {
-      try {
-        const result = await getWayForPayPaymentFormParams(orderId);
-
-        if (result.success && result.params) {
-          console.log("Received params:", result.params);
-
-          // call the util for redirecting to the payment page
-          redirectToWayForPay(result.params);
-        } else {
-          toast.error(
-            result.message || "Failed to initiate payment. Please try again.",
-            {
-              richColors: true,
-            },
-          );
-          setPayingOrderId(null);
-        }
-      } catch (error) {
-        console.error("Payment initiation error:", error);
-        toast.error("An unexpected error occurred while initiating payment.", {
-          richColors: true,
-        });
-        setPayingOrderId(null);
-      }
-    });
-  };
-
   return (
     <>
       {orders.length > 0 ? (
@@ -125,7 +77,6 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
                   order={order}
                   isCancelling={isCancelPending}
                   isCurrentOrderCancelling={cancellingOrderId === order.id}
-                  onPayNow={handlePayNow}
                   onInitiateCancel={handleCancelOrder}
                   highlight={order.id === orderId}
                 />
