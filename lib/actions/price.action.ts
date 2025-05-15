@@ -246,7 +246,7 @@ export async function purchasePackegeAction(
       });
 
       // 3.2 Create the Package Purchase record
-      const createdPurchase = await tx.packagePurchase.create({
+      await tx.packagePurchase.create({
         data: {
           clientId: userId,
           packageTemplateId: packageTemplate.id,
@@ -256,7 +256,7 @@ export async function purchasePackegeAction(
         },
       });
 
-      return { order: createdOrder, purchase: createdPurchase };
+      return { order: createdOrder };
     });
 
     // 4. Revalidate the path to update the UI

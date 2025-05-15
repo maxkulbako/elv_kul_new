@@ -181,7 +181,7 @@ export async function scheduleAppointment(
 
       // 4.2 Create Appointment (PENDING_PAYMENT) and Order within a transaction
       try {
-        const { appointment, order } = await prisma.$transaction(async (tx) => {
+        const { order } = await prisma.$transaction(async (tx) => {
           // Create Order first
           const createdOrder = await tx.order.create({
             data: {
@@ -215,56 +215,8 @@ export async function scheduleAppointment(
             data: { appointmentId: createdAppointment.id },
           });
 
-          return { appointment: createdAppointment, order: createdOrder };
+          return { order: createdOrder };
         });
-
-        // 4.3 Initiate Payment with Stripe (outside the DB transaction)
-        // This part requires integrating the Stripe SDK
-        /*
-         try {
-            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!); // Initialize Stripe
-
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: finalPrice.mul(100).toNumber(), // Amount in cents
-                currency: order.currency.toLowerCase(),
-                metadata: {
-                    orderId: order.id,
-                    appointmentId: appointment.id,
-                    userId: targetClientId,
-                },
-                // Add customer ID if you manage customers in Stripe
-                // customer: stripeCustomerId,
-            });
-
-            // 4.4 Update Order with Payment Intent ID
-            await prisma.order.update({
-                where: { id: order.id },
-                data: { paymentIntentId: paymentIntent.id }
-            });
-
-            revalidatePath("/client/dashboard");
-            revalidatePath("/client/appointments");
-            revalidatePath("/admin/calendar");
-
-            // Return client secret to the frontend to confirm the payment
-            return {
-                success: true,
-                message: "Appointment pending payment.",
-                requiresPayment: true,
-                clientSecret: paymentIntent.client_secret,
-                orderId: order.id
-            };
-
-         } catch (stripeError) {
-             console.error("Stripe Payment Intent creation failed:", stripeError);
-             // TODO: Consider how to handle this - maybe mark order/appointment as failed?
-             return { success: false, message: "Failed to initiate payment process. Please try again." };
-         }
-         */
-        // --- Placeholder until Stripe is integrated ---
-        console.log(
-          `Order ${order.id} and Appointment ${appointment.id} created with PENDING status. Price: ${finalPrice}`,
-        );
 
         revalidatePath("/client/dashboard");
         revalidatePath("/client/appointments");
@@ -272,8 +224,7 @@ export async function scheduleAppointment(
 
         return {
           success: true,
-          message:
-            "Appointment created, pending payment (Stripe integration needed).",
+          message: "Appointment created, pending payment",
           requiresPayment: true,
           orderId: order.id,
         };

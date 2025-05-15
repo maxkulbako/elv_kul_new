@@ -24,6 +24,7 @@ enum AppointmentStatus {
   PENDING_PAYMENT
   PAID
   PAID_FROM_PACKAGE
+  PAYMENT_FAILED
   COMPLETED
   CANCELLED
   RESCHEDULED
@@ -53,6 +54,7 @@ enum PackagePurchaseStatus {
   ACTIVE
   EXPIRED
   CANCELLED
+  REFUNDED
 }
 
 enum OrderStatus {
@@ -61,6 +63,7 @@ enum OrderStatus {
   FAILED
   CANCELLED
   REFUNDED
+  SUPERSEDED_BY_PACKAGE
 }
 
 enum OrderType {
