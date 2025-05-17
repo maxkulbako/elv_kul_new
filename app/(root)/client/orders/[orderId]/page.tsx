@@ -32,6 +32,8 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { getOrderDetailsById } from "@/lib/actions/price.action";
 import PayNowButton from "@/components/shared/PayNowButton";
+import { Url } from "url";
+import { OrderStatus } from "@prisma/client";
 
 const getStatusConfig = (status: string) => {
   switch (status.toLowerCase()) {
@@ -83,6 +85,9 @@ const OrderDetailPage = async ({
 
   // In a real implementation, we would fetch this from an API
   const order = await getOrderDetailsById(orderId || "");
+  if (order?.status === OrderStatus.PENDING && order.repayUrl) {
+    order.status = OrderStatus.FAILED;
+  }
 
   if (!order) {
     return (
@@ -190,18 +195,23 @@ const OrderDetailPage = async ({
               <AlertTitle>Payment Failed</AlertTitle>
               <AlertDescription>
                 Unfortunately, there was a problem processing your payment.
-                {/* TODO: add failure reason from wayforpay api */}
-                {/* {order.failureReason && ` Reason: ${order.failureReason}`} */}
+                {order.failureReason && ` Reason: ${order.failureReason}`}
               </AlertDescription>
             </Alert>
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button
-                className="bg-olive-primary hover:bg-olive-primary/90 flex-1"
-                //                onClick={handleRetryPayment}
+              <Link
+                href={(order.repayUrl as unknown as Url) || ""}
+                target="_blank"
               >
-                <ArrowRight className="mr-2 h-4 w-4" />
-                Try Again
-              </Button>
+                <Button
+                  className="bg-olive-primary hover:bg-olive-primary/90 flex-1"
+                  disabled={!order.repayUrl}
+                >
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  Try Again
+                </Button>{" "}
+              </Link>
+
               <Button
                 variant="outline"
                 //                    onClick={handleContactSupport}

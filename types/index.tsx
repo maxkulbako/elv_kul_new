@@ -10,3 +10,5 @@ export type CreatePackageFormValues = z.infer<typeof createPackageFormSchema>;
 export type UpdateAppointmentStatusFormValues = z.infer<
   typeof updateAppointmentStatusFormSchema
 >;
+
+export type TxResult = { success: boolean; message: string };

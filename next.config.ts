@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     "http://localhost:5173",
     "https://rather-side-wedding-kerry.trycloudflare.com",
   ],
+  images: {
+    domains: ["i.pravatar.cc"],
+  },
   /* config options here */
 };
 

@@ -21,6 +21,8 @@ export type WayForPayFormParams = {
   productPrice: string[];
   returnUrl: string;
   serviceUrl: string;
+  orderLifetime: number;
+  orderTimeout: number;
 };
 
 export async function getWayForPayPaymentFormParams(
@@ -101,6 +103,8 @@ export async function getWayForPayPaymentFormParams(
     productPrice: priceStrs,
     returnUrl: retUrl,
     serviceUrl: svcUrl,
+    orderLifetime: 120,
+    orderTimeout: 120, // 2 minutes for testing
   };
 
   return {

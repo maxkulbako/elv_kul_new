@@ -11,10 +11,11 @@ import { auth } from "@/auth";
 const UserPackagesPage = async ({
   searchParams,
 }: {
-  searchParams: { orderId?: string };
+  searchParams: Promise<{ orderId?: string }>;
 }) => {
   const availablePackages = await getAvailablePackages();
   const session = await auth();
+  const { orderId } = await searchParams;
 
   const orders = await getOrdersByClientId(session?.user.id as string);
 
@@ -27,10 +28,7 @@ const UserPackagesPage = async ({
         </p>
       </div>
 
-      <Tabs
-        defaultValue={searchParams.orderId ? "orders" : "active"}
-        className="space-y-4"
-      >
+      <Tabs defaultValue={orderId ? "orders" : "active"} className="space-y-4">
         <TabsList>
           <TabsTrigger value="active">Active Package</TabsTrigger>
           <TabsTrigger value="available">Available Packages</TabsTrigger>
