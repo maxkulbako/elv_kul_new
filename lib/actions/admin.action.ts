@@ -7,6 +7,7 @@ import { TimeSlot } from "@/app/(root)/admin/calendar/AvailabilityManager";
 import { endOfDay, startOfDay } from "date-fns";
 import { AppointmentStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { AppointmentCardDTO } from "@/types/appointments";
 
 export async function getAdminAppointments(
   take?: number,
@@ -57,7 +58,9 @@ export async function getAdminAppointments(
   }));
 }
 
-export async function getUpcommingAppointments(numberOfAppointments: number) {
+export async function getUpcommingAppointments(
+  numberOfAppointments: number,
+): Promise<AppointmentCardDTO[]> {
   const session = await auth();
   if (!session?.user || session.user.role !== "ADMIN")
     throw new Error("Unauthorized");
@@ -74,14 +77,68 @@ export async function getUpcommingAppointments(numberOfAppointments: number) {
     },
     take: numberOfAppointments,
     include: {
-      client: {
-        select: {
-          name: true,
-        },
+      client: { select: { name: true } },
+      order: { select: { id: true, type: true, status: true, repayUrl: true } },
+      packagePurchase: {
+        select: { id: true, sessionsTotal: true, sessionsUsed: true },
       },
     },
   });
-  return appointments;
+
+  return appointments.map((a) => ({
+    id: a.id,
+    date: a.date,
+    status: a.status,
+    repayUrl: a.order?.repayUrl ?? null,
+    order: a.order
+      ? { id: a.order.id, type: a.order.type, status: a.order.status }
+      : null,
+    packagePurchase: a.packagePurchase
+      ? {
+          id: a.packagePurchase.id,
+          sessionsTotal: a.packagePurchase.sessionsTotal,
+          sessionsUsed: a.packagePurchase.sessionsUsed,
+        }
+      : null,
+    client: { name: a.client.name || "Unknown Client" },
+    durationMin: a.durationMin,
+  }));
+}
+
+export async function getAppointmentDTO(
+  id: string,
+): Promise<AppointmentCardDTO | null> {
+  const a = await prisma.appointment.findUnique({
+    where: { id },
+    include: {
+      client: { select: { name: true } },
+      order: {
+        select: { id: true, type: true, status: true, repayUrl: true },
+      },
+      packagePurchase: {
+        select: { id: true, sessionsTotal: true, sessionsUsed: true },
+      },
+    },
+  });
+  if (!a) return null;
+  return {
+    id: a.id,
+    date: a.date,
+    status: a.status,
+    repayUrl: a.order?.repayUrl ?? null,
+    order: a.order
+      ? { id: a.order.id, type: a.order.type, status: a.order.status }
+      : null,
+    packagePurchase: a.packagePurchase
+      ? {
+          id: a.packagePurchase.id,
+          sessionsTotal: a.packagePurchase.sessionsTotal,
+          sessionsUsed: a.packagePurchase.sessionsUsed,
+        }
+      : null,
+    client: { name: a.client.name || "Unknown Client" },
+    durationMin: a.durationMin,
+  };
 }
 
 export async function getAllClients(query: string = "") {
