@@ -4,8 +4,10 @@ import { auth } from "@/auth";
 
 export default async function ClientPortalLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   const session = await auth();
 
@@ -13,6 +15,7 @@ export default async function ClientPortalLayout({
     <SidebarProvider>
       <AppSideBar user={session?.user} />
       <div className="flex flex-col bg-olive-light w-full">{children}</div>
+      {modal}
     </SidebarProvider>
   );
 }

@@ -24,9 +24,11 @@ enum AppointmentStatus {
   PENDING_PAYMENT
   PAID
   PAID_FROM_PACKAGE
+  PAYMENT_FAILED
   COMPLETED
   CANCELLED
   RESCHEDULED
+  COMPLETED_AND_REFUNDED
 }
 
 enum PaymentMethod {
@@ -52,6 +54,7 @@ enum PackagePurchaseStatus {
   ACTIVE
   EXPIRED
   CANCELLED
+  REFUNDED
 }
 
 enum OrderStatus {
@@ -60,6 +63,7 @@ enum OrderStatus {
   FAILED
   CANCELLED
   REFUNDED
+  SUPERSEDED_BY_PACKAGE
 }
 
 enum OrderType {
@@ -137,6 +141,10 @@ model Order {
   status          OrderStatus @default(PENDING)
   paymentIntentId String?     @unique
   paidAt          DateTime?
+  refundAt        DateTime?
+  refundReason    String?
+  failureReason   String?
+  repayUrl        String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

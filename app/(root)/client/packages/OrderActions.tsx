@@ -11,14 +11,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CircleDollarSign, Receipt, X, Loader2 } from "lucide-react";
+import { Receipt, X, Loader2 } from "lucide-react";
 import { type UserOrder } from "@/lib/actions/price.action"; // Переконайся, що шлях правильний
+import PayNowButton from "@/components/shared/PayNowButton";
 
 interface OrderActionsProps {
   order: UserOrder;
   isCancelling: boolean;
   isCurrentOrderCancelling: boolean;
-  onPayNow: (orderId: string) => void;
   onInitiateCancel: (orderId: string) => void;
   // onRetry: (orderId: string) => void; // TODO: Add retry functionality
 }
@@ -27,7 +27,6 @@ export const OrderActions: React.FC<OrderActionsProps> = ({
   order,
   isCancelling,
   isCurrentOrderCancelling,
-  onPayNow,
   onInitiateCancel,
   // onRetry,
 }) => {
@@ -35,15 +34,7 @@ export const OrderActions: React.FC<OrderActionsProps> = ({
     case "PENDING":
       return (
         <div className="flex flex-wrap gap-2 justify-end">
-          <Button
-            size="sm"
-            className="bg-olive-primary hover:bg-olive-primary/90"
-            onClick={() => onPayNow(order.id)}
-            disabled={isCurrentOrderCancelling}
-          >
-            <CircleDollarSign className="mr-1 h-4 w-4" />
-            Pay Now
-          </Button>
+          <PayNowButton orderId={order.id} />
 
           <AlertDialog>
             <AlertDialogTrigger asChild>

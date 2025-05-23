@@ -1,11 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { AppointmentStatus, OrderStatus } from "@prisma/client";
 import { auth } from "@/auth";
 import { Decimal } from "@prisma/client/runtime/library";
 import { revalidatePath } from "next/cache";
 import { format, startOfDay, endOfDay } from "date-fns";
 import { Prisma } from "@prisma/client";
+import { differenceInHours } from "date-fns";
+import { TxResult } from "@/types";
 
 export async function scheduleAppointment(
   _prevState: unknown,
@@ -18,11 +21,17 @@ export async function scheduleAppointment(
   orderId?: string;
 }> {
   const session = await auth();
-  const clientId = session?.user?.id;
+  if (!session?.user) throw new Error("Unauthorized");
 
-  if (!clientId) throw new Error("Unauthorized");
+  const timeSlotId = formData.get("timeSlotId") as string;
+  const clientId = formData.get("clientId") as string | undefined;
 
-  const timeSlotId = formData.get("timeSlotId") as string | null;
+  // If clientId is provided (admin scheduling), use it, otherwise use the current user's ID
+  const targetClientId = clientId || session.user.id;
+
+  if (!targetClientId) {
+    throw new Error("Client ID is required");
+  }
 
   if (!timeSlotId) {
     return { success: false, message: "Time slot ID is required" };
@@ -56,7 +65,7 @@ export async function scheduleAppointment(
     const now = new Date();
     const activePackage = await prisma.packagePurchase.findFirst({
       where: {
-        clientId: clientId,
+        clientId: targetClientId,
         status: "ACTIVE",
         sessionsUsed: { lt: prisma.packagePurchase.fields.sessionsTotal },
         endDate: { gte: startOfDay(now) },
@@ -74,7 +83,7 @@ export async function scheduleAppointment(
             data: {
               date: availableSlot.date,
               durationMin: 50, // TODO: Think about it
-              clientId: clientId,
+              clientId: targetClientId,
               adminId: adminId,
               status: "PAID_FROM_PACKAGE",
               priceApplied: new Decimal(0),
@@ -136,7 +145,7 @@ export async function scheduleAppointment(
 
       // Check for client-specific price first
       const clientData = await prisma.user.findUnique({
-        where: { id: clientId },
+        where: { id: targetClientId },
         select: { clientSpecialPrice: true },
       });
 
@@ -164,7 +173,7 @@ export async function scheduleAppointment(
       // Check if a price was determined
       if (!finalPrice) {
         console.error(
-          `Could not determine price for client ${clientId} and no active package.`,
+          `Could not determine price for client ${targetClientId} and no active package.`,
         );
         return {
           success: false,
@@ -175,11 +184,11 @@ export async function scheduleAppointment(
 
       // 4.2 Create Appointment (PENDING_PAYMENT) and Order within a transaction
       try {
-        const { appointment, order } = await prisma.$transaction(async (tx) => {
+        const { order } = await prisma.$transaction(async (tx) => {
           // Create Order first
           const createdOrder = await tx.order.create({
             data: {
-              userId: clientId,
+              userId: targetClientId,
               type: "SINGLE_SESSION",
               amount: finalPrice as Decimal,
               currency: "UAH", // TODO: Or get from config/settings
@@ -193,7 +202,7 @@ export async function scheduleAppointment(
             data: {
               date: availableSlot.date,
               durationMin: availableSlot.duration,
-              clientId: clientId,
+              clientId: targetClientId,
               adminId: adminId,
               status: "PENDING_PAYMENT",
               priceApplied: finalPrice as Decimal,
@@ -209,56 +218,8 @@ export async function scheduleAppointment(
             data: { appointmentId: createdAppointment.id },
           });
 
-          return { appointment: createdAppointment, order: createdOrder };
+          return { order: createdOrder };
         });
-
-        // 4.3 Initiate Payment with Stripe (outside the DB transaction)
-        // This part requires integrating the Stripe SDK
-        /*
-         try {
-            const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!); // Initialize Stripe
-
-            const paymentIntent = await stripe.paymentIntents.create({
-                amount: finalPrice.mul(100).toNumber(), // Amount in cents
-                currency: order.currency.toLowerCase(),
-                metadata: {
-                    orderId: order.id,
-                    appointmentId: appointment.id,
-                    userId: clientId,
-                },
-                // Add customer ID if you manage customers in Stripe
-                // customer: stripeCustomerId,
-            });
-
-            // 4.4 Update Order with Payment Intent ID
-            await prisma.order.update({
-                where: { id: order.id },
-                data: { paymentIntentId: paymentIntent.id }
-            });
-
-            revalidatePath("/client/dashboard");
-            revalidatePath("/client/appointments");
-            revalidatePath("/admin/calendar");
-
-            // Return client secret to the frontend to confirm the payment
-            return {
-                success: true,
-                message: "Appointment pending payment.",
-                requiresPayment: true,
-                clientSecret: paymentIntent.client_secret,
-                orderId: order.id
-            };
-
-         } catch (stripeError) {
-             console.error("Stripe Payment Intent creation failed:", stripeError);
-             // TODO: Consider how to handle this - maybe mark order/appointment as failed?
-             return { success: false, message: "Failed to initiate payment process. Please try again." };
-         }
-         */
-        // --- Placeholder until Stripe is integrated ---
-        console.log(
-          `Order ${order.id} and Appointment ${appointment.id} created with PENDING status. Price: ${finalPrice}`,
-        );
 
         revalidatePath("/client/dashboard");
         revalidatePath("/client/appointments");
@@ -266,8 +227,7 @@ export async function scheduleAppointment(
 
         return {
           success: true,
-          message:
-            "Appointment created, pending payment (Stripe integration needed).",
+          message: "Appointment created, pending payment",
           requiresPayment: true,
           orderId: order.id,
         };
@@ -356,6 +316,128 @@ export async function cancelAppointment(
   }
 }
 
+type CancelOpts = {
+  cancelledBy: "ADMIN" | "CLIENT" | "SYSTEM";
+  reason?: string;
+  /** transaction client, if called inside $transaction */
+  tx?: Prisma.TransactionClient;
+};
+
+/**
+ * Cancels an appointment and handles related entities.
+ *
+ * @param appointmentId - The ID of the appointment to cancel.
+ * @param opts - Options for the cancellation.
+ * @returns A promise that resolves to a TxResult object.
+ */
+export async function cancelAppointmentTx(
+  appointmentId: string,
+  opts: CancelOpts,
+): Promise<TxResult> {
+  try {
+    /* ------------------------------------------------------------------ */
+    /* 1. Inside ONE transaction (if tx not passed – create it)    */
+    /* ------------------------------------------------------------------ */
+    const run = async (trx: Prisma.TransactionClient) => {
+      const appointment = await trx.appointment.findUnique({
+        where: { id: appointmentId },
+        include: {
+          order: true,
+          packagePurchase: true,
+          availableSlot: true,
+        },
+      });
+
+      if (!appointment) {
+        throw new Error("Appointment not found");
+      }
+
+      /* — already finalised? ------------------------------------------------ */
+      const FINAL: AppointmentStatus[] = [
+        "CANCELLED",
+        "COMPLETED",
+        "COMPLETED_AND_REFUNDED",
+      ];
+      if (FINAL.includes(appointment.status)) {
+        return { success: true, message: "Already finalised" } as TxResult;
+      }
+
+      /* — client rule 24h -------------------------------------- */
+      if (opts.cancelledBy === "CLIENT") {
+        const hrs = differenceInHours(appointment.date, new Date());
+        if (hrs < 24) {
+          return {
+            success: false,
+            message: "Late cancellation (&lt;24 h) is not allowed",
+          };
+        }
+      }
+
+      /* — A. update Appointment ------------------------------------- */
+      await trx.appointment.update({
+        where: { id: appointmentId },
+        data: {
+          status: AppointmentStatus.CANCELLED,
+          availableSlotId: null,
+          updatedAt: new Date(),
+          notes:
+            (appointment.notes ? appointment.notes + "\n— " : "") +
+            `cancelled (${opts.cancelledBy})${opts.reason ? `: ${opts.reason}` : ""}`,
+        },
+      });
+
+      /* — B. release slot ------------------------------------------- */
+      if (appointment.availableSlotId) {
+        await trx.availableSlot.update({
+          where: { id: appointment.availableSlotId },
+          data: { appointmentId: null },
+        });
+      }
+
+      /* — C. PENDING-order → CANCELLED --------------------------------- */
+      if (
+        appointment.orderId &&
+        appointment.order?.status === OrderStatus.PENDING
+      ) {
+        await trx.order.update({
+          where: { id: appointment.orderId },
+          data: { status: OrderStatus.CANCELLED },
+        });
+      }
+
+      /* — D. Package: admin can "return" a session ------------------------ */
+      if (
+        appointment.packagePurchaseId &&
+        appointment.status === AppointmentStatus.PAID_FROM_PACKAGE &&
+        opts.cancelledBy === "ADMIN"
+      ) {
+        await trx.packagePurchase.update({
+          where: { id: appointment.packagePurchaseId },
+          data: { sessionsUsed: { decrement: 1 } },
+        });
+      }
+
+      return { success: true, message: "Appointment cancelled" } as TxResult;
+    };
+
+    // run inside already opened trx or open a new one
+    const result = opts.tx
+      ? await run(opts.tx)
+      : await prisma.$transaction(run);
+
+    /* —— Revalidate UI only if we were outside transaction  ——————— */
+    if (!opts.tx) {
+      revalidatePath("/client/appointments");
+      revalidatePath("/admin/calendar");
+    }
+
+    return result;
+  } catch (err) {
+    console.error("cancelAppointmentTx error:", err);
+    return { success: false, message: "Unexpected error while cancelling" };
+  }
+}
+
 export async function getCalendarAppointments() {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
@@ -391,6 +473,13 @@ export async function getClientAppointments() {
       status: {
         notIn: ["CANCELLED", "COMPLETED"],
       },
+    },
+    select: {
+      id: true,
+      date: true,
+      durationMin: true,
+      status: true,
+      orderId: true,
     },
     orderBy: {
       date: "asc",

@@ -5,6 +5,9 @@ import { prisma } from "@/lib/prisma";
 
 import { TimeSlot } from "@/app/(root)/admin/calendar/AvailabilityManager";
 import { endOfDay, startOfDay } from "date-fns";
+import { AppointmentStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { AppointmentCardDTO } from "@/types/appointments";
 
 export async function getAdminAppointments(
   take?: number,
@@ -46,12 +49,96 @@ export async function getAdminAppointments(
       },
     },
   });
+  console.log(appointments);
 
   // Convert Decimal to number for serialization
   return appointments.map((appointment) => ({
     ...appointment,
     price: appointment.priceApplied ? Number(appointment.priceApplied) : null,
   }));
+}
+
+export async function getUpcommingAppointments(
+  numberOfAppointments: number,
+): Promise<AppointmentCardDTO[]> {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  const appointments = await prisma.appointment.findMany({
+    where: {
+      adminId: session.user.id,
+      date: {
+        gte: new Date(),
+      },
+    },
+    orderBy: {
+      date: "asc",
+    },
+    take: numberOfAppointments,
+    include: {
+      client: { select: { name: true } },
+      order: { select: { id: true, type: true, status: true, repayUrl: true } },
+      packagePurchase: {
+        select: { id: true, sessionsTotal: true, sessionsUsed: true },
+      },
+    },
+  });
+
+  return appointments.map((a) => ({
+    id: a.id,
+    date: a.date,
+    status: a.status,
+    repayUrl: a.order?.repayUrl ?? null,
+    order: a.order
+      ? { id: a.order.id, type: a.order.type, status: a.order.status }
+      : null,
+    packagePurchase: a.packagePurchase
+      ? {
+          id: a.packagePurchase.id,
+          sessionsTotal: a.packagePurchase.sessionsTotal,
+          sessionsUsed: a.packagePurchase.sessionsUsed,
+        }
+      : null,
+    client: { name: a.client.name || "Unknown Client" },
+    durationMin: a.durationMin,
+  }));
+}
+
+export async function getAppointmentDTO(
+  id: string,
+): Promise<AppointmentCardDTO | null> {
+  const a = await prisma.appointment.findUnique({
+    where: { id },
+    include: {
+      client: { select: { name: true } },
+      order: {
+        select: { id: true, type: true, status: true, repayUrl: true },
+      },
+      packagePurchase: {
+        select: { id: true, sessionsTotal: true, sessionsUsed: true },
+      },
+    },
+  });
+  if (!a) return null;
+  return {
+    id: a.id,
+    date: a.date,
+    status: a.status,
+    repayUrl: a.order?.repayUrl ?? null,
+    order: a.order
+      ? { id: a.order.id, type: a.order.type, status: a.order.status }
+      : null,
+    packagePurchase: a.packagePurchase
+      ? {
+          id: a.packagePurchase.id,
+          sessionsTotal: a.packagePurchase.sessionsTotal,
+          sessionsUsed: a.packagePurchase.sessionsUsed,
+        }
+      : null,
+    client: { name: a.client.name || "Unknown Client" },
+    durationMin: a.durationMin,
+  };
 }
 
 export async function getAllClients(query: string = "") {
@@ -138,13 +225,8 @@ export const getClientById = async (id: string) => {
         },
       },
       appointments: {
-        where: {
-          date: {
-            gte: new Date(),
-          },
-        },
         orderBy: {
-          date: "asc",
+          date: "desc",
         },
         select: {
           id: true,
@@ -321,7 +403,9 @@ export async function getAdminAppointmentsDates(year: number, month: number) {
         gte: startDate,
         lte: endDate,
       },
-      status: "SCHEDULED",
+      status: {
+        notIn: ["CANCELLED", "RESCHEDULED"],
+      },
     },
     select: {
       date: true,
@@ -350,7 +434,9 @@ export async function getAdminAppointmentsByDate(date: Date) {
         gte: startOfDay,
         lte: endOfDay,
       },
-      status: "SCHEDULED",
+      status: {
+        notIn: ["CANCELLED", "RESCHEDULED"],
+      },
     },
     select: {
       id: true,
@@ -371,4 +457,59 @@ export async function getAdminAppointmentsByDate(date: Date) {
     clientName: appointment.client.name || "Unknown Client",
     type: "Individual Therapy", //TODO: add type to appointment model
   }));
+}
+
+export async function updateAppointmentStatus(
+  appointmentId: string,
+  status: AppointmentStatus,
+) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  try {
+    await prisma.appointment.update({
+      where: {
+        id: appointmentId,
+      },
+      data: {
+        status,
+      },
+    });
+
+    revalidatePath("/admin/calendar");
+
+    return {
+      success: true,
+      message: "Appointment status updated successfully",
+    };
+  } catch (error) {
+    console.error("Failed to update appointment status:", error);
+    return {
+      success: false,
+      message: "Failed to update appointment status",
+    };
+  }
+}
+
+export async function getAdminClients() {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN")
+    throw new Error("Unauthorized");
+
+  const clients = await prisma.user.findMany({
+    where: {
+      role: "CLIENT",
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+    },
+    orderBy: {
+      name: "asc",
+    },
+  });
+
+  return clients;
 }

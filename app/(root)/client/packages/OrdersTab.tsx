@@ -16,22 +16,20 @@ import {
 import { toast } from "sonner";
 import { useState, useTransition } from "react";
 import { OrderCard } from "./OrderCard";
-import { redirectToWayForPay } from "@/lib/utils/payments";
-import { getWayForPayPaymentFormParams } from "@/lib/actions/payments/wayforpay";
+import { useSearchParams } from "next/navigation";
 
 interface OrdersTabProps {
   orders: UserOrder[];
 }
 
 const OrdersTab = ({ orders }: OrdersTabProps) => {
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("orderId");
+  console.log("orderId", orderId);
   const [isCancelPending, startCancelTransition] = useTransition();
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(
     null,
   );
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isPayPending, startPayTransition] = useTransition();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [payingOrderId, setPayingOrderId] = useState<string | null>(null);
 
   const handleCancelOrder = (orderId: string) => {
     setCancellingOrderId(orderId);
@@ -59,36 +57,6 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
     });
   };
 
-  const handlePayNow = (orderId: string) => {
-    setPayingOrderId(orderId);
-    startPayTransition(async () => {
-      try {
-        const result = await getWayForPayPaymentFormParams(orderId);
-
-        if (result.success && result.params) {
-          console.log("Received params:", result.params);
-
-          // call the util for redirecting to the payment page
-          redirectToWayForPay(result.params);
-        } else {
-          toast.error(
-            result.message || "Failed to initiate payment. Please try again.",
-            {
-              richColors: true,
-            },
-          );
-          setPayingOrderId(null);
-        }
-      } catch (error) {
-        console.error("Payment initiation error:", error);
-        toast.error("An unexpected error occurred while initiating payment.", {
-          richColors: true,
-        });
-        setPayingOrderId(null);
-      }
-    });
-  };
-
   return (
     <>
       {orders.length > 0 ? (
@@ -96,7 +64,9 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
           <CardHeader>
             <CardTitle>My Orders</CardTitle>
             <CardDescription>
-              Track your package and session purchases
+              {orderId
+                ? "Complete your payment for the selected appointment"
+                : "Track your package and session purchases"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -107,8 +77,8 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
                   order={order}
                   isCancelling={isCancelPending}
                   isCurrentOrderCancelling={cancellingOrderId === order.id}
-                  onPayNow={handlePayNow}
                   onInitiateCancel={handleCancelOrder}
+                  highlight={order.id === orderId}
                 />
               ))}
             </div>

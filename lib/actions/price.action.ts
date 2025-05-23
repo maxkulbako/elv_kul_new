@@ -246,7 +246,7 @@ export async function purchasePackegeAction(
       });
 
       // 3.2 Create the Package Purchase record
-      const createdPurchase = await tx.packagePurchase.create({
+      await tx.packagePurchase.create({
         data: {
           clientId: userId,
           packageTemplateId: packageTemplate.id,
@@ -256,7 +256,7 @@ export async function purchasePackegeAction(
         },
       });
 
-      return { order: createdOrder, purchase: createdPurchase };
+      return { order: createdOrder };
     });
 
     // 4. Revalidate the path to update the UI
@@ -328,92 +328,181 @@ export async function getOrdersByClientId(userId: string) {
   }));
 }
 
+export async function getOrderDetailsById(orderId: string) {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      packagePurchase: {
+        include: {
+          packageTemplate: true,
+        },
+      },
+      appointment: true,
+    },
+  });
+  return order;
+}
+
 export type UserOrder = Prisma.PromiseReturnType<
   typeof getOrdersByClientId
 >[number];
 
-export async function cancelPendingOrderAction(
-  orderId: string,
-): Promise<{ success: boolean; message: string }> {
+export async function cancelPendingOrderAction({
+  orderId,
+  system,
+}: {
+  orderId: string;
+  system: boolean;
+}): Promise<{ success: boolean; message: string }> {
+  console.log("🚀 Starting order cancellation process:", { orderId, system });
+
   const session = await auth();
   const userId = session?.user?.id;
+  console.log("👤 User session:", { userId, isSystem: system });
 
-  if (!userId) {
+  if (!userId && !system) {
+    console.log("❌ Authorization failed: No user ID and not a system call");
     return { success: false, message: "Unauthorized" };
   }
   if (!orderId) {
+    console.log("❌ Validation failed: No order ID provided");
     return { success: false, message: "Order ID is required." };
   }
 
   try {
+    console.log("🔄 Starting database transaction");
     const result = await prisma.$transaction(async (tx) => {
       // 1. Find the order and verify ownership and status
+      console.log("🔍 Fetching order details:", orderId);
       const order = await tx.order.findUnique({
         where: { id: orderId },
         include: {
-          // Include related entities to know what needs cancelling
           packagePurchase: { select: { id: true } },
           appointment: { select: { id: true, availableSlotId: true } },
         },
       });
 
+      console.log("📦 Order details:", {
+        found: !!order,
+        userId: order?.userId,
+        status: order?.status,
+        type: order?.type,
+        hasPackagePurchase: !!order?.packagePurchase,
+        hasAppointment: !!order?.appointment,
+      });
+
       // Check if order exists and belongs to the user
       if (!order) {
+        console.log("❌ Order not found:", orderId);
         throw new Error("Order not found.");
       }
-      if (order.userId !== userId) {
-        // TODO: Optional: Admins might be allowed to cancel, add role check if needed
+      if (order.userId !== userId && !system) {
+        console.log("❌ Permission denied:", {
+          orderUserId: order.userId,
+          currentUserId: userId,
+        });
         throw new Error("You do not have permission to cancel this order.");
       }
 
       // Check if the order is actually pending
-      if (order.status !== "PENDING") {
-        throw new Error(`Cannot cancel order with status: ${order.status}`);
+      if (order.status !== "PENDING" && !system) {
+        console.log("❌ Invalid order status:", {
+          currentStatus: order.status,
+          requiredStatus: "PENDING",
+        });
+        throw new Error(
+          `No permission to cancel order with status: ${order.status}`,
+        );
       }
 
       // 2. Update the Order status
-      await tx.order.update({
-        where: { id: orderId },
-        data: { status: "CANCELLED" },
-      });
+      if (!system) {
+        console.log("📝 Updating order status to CANCELLED");
+        await tx.order.update({
+          where: { id: orderId },
+          data: { status: "CANCELLED" },
+        });
+      }
 
       // 3. Update related entities based on order type
       if (order.type === "PACKAGE" && order.packagePurchase) {
+        console.log("📦 Processing package purchase cancellation");
         // Cancel the related PackagePurchase
         await tx.packagePurchase.update({
           where: { id: order.packagePurchase.id },
           data: { status: "CANCELLED" },
         });
+        console.log("✅ Package purchase cancelled successfully");
       } else if (order.type === "SINGLE_SESSION" && order.appointment) {
+        console.log("📅 Processing appointment cancellation");
         // Cancel the related Appointment
-        await tx.appointment.update({
+        const appointment = await tx.appointment.findUnique({
           where: { id: order.appointment.id },
-          data: {
-            status: "CANCELLED",
-            availableSlotId: null,
-            updatedAt: new Date(),
-          },
+          include: { availableSlot: true },
         });
+
+        console.log("📊 Appointment status:", {
+          id: appointment?.id,
+          status: appointment?.status,
+          hasAvailableSlot: !!appointment?.availableSlot,
+        });
+
+        if (
+          appointment?.status === "PAID" ||
+          appointment?.status === "PENDING_PAYMENT"
+        ) {
+          console.log("💰 Cancelling paid or pending payment appointment");
+          await tx.appointment.update({
+            where: { id: order.appointment.id },
+            data: {
+              status: "CANCELLED",
+              availableSlotId: null,
+              updatedAt: new Date(),
+            },
+          });
+        } else if (appointment?.status === "COMPLETED") {
+          console.log("✅ Cancelling completed appointment with refund");
+          await tx.appointment.update({
+            where: { id: order.appointment.id },
+            data: {
+              status: "COMPLETED_AND_REFUNDED",
+              availableSlotId: null,
+              updatedAt: new Date(),
+            },
+          });
+        }
 
         // Free up the associated AvailableSlot if it exists
         if (order.appointment.availableSlotId) {
+          console.log(
+            "🕒 Freeing up available slot:",
+            order.appointment.availableSlotId,
+          );
           await tx.availableSlot.update({
             where: { id: order.appointment.availableSlotId },
-            data: { appointmentId: null }, // Remove the link
+            data: { appointmentId: null },
           });
+          console.log("✅ Available slot freed successfully");
         }
       }
 
+      console.log("✅ Transaction completed successfully");
       return { success: true, message: "Order cancelled successfully." };
     }); // End of transaction
 
     // 4. Revalidate paths after successful transaction
-    revalidatePath("/client/packages"); // Update orders list
-    revalidatePath("/client/appointments"); // Update appointments list if one was cancelled
+    console.log("🔄 Revalidating paths");
+    revalidatePath("/client/packages");
+    revalidatePath("/client/appointments");
+    console.log("✅ Paths revalidated");
 
     return result;
   } catch (error) {
-    console.error("Error cancelling order:", error);
+    console.error("❌ Error in cancellation process:", {
+      error,
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return {
       success: false,
       message:

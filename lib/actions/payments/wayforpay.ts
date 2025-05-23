@@ -21,13 +21,20 @@ export type WayForPayFormParams = {
   productPrice: string[];
   returnUrl: string;
   serviceUrl: string;
+  orderLifetime: number;
+  orderTimeout: number;
 };
 
-export async function getWayForPayPaymentFormParams(orderId: string) {
+export async function getWayForPayPaymentFormParams(
+  _previosData: unknown,
+  formData: FormData,
+) {
   const session = await auth();
   if (!session?.user?.id) {
     return { success: false, message: "Unauthorized" };
   }
+
+  const orderId = formData.get("orderId");
 
   if (!orderId) {
     return { success: false, message: "Order ID is required." };
@@ -39,7 +46,7 @@ export async function getWayForPayPaymentFormParams(orderId: string) {
   }
 
   const order = await prisma.order.findUnique({
-    where: { id: orderId },
+    where: { id: orderId as string },
     include: {
       packagePurchase: {
         include: { packageTemplate: { select: { name: true } } },
@@ -96,6 +103,8 @@ export async function getWayForPayPaymentFormParams(orderId: string) {
     productPrice: priceStrs,
     returnUrl: retUrl,
     serviceUrl: svcUrl,
+    orderLifetime: 120,
+    orderTimeout: 120, // 2 minutes for testing
   };
 
   return {

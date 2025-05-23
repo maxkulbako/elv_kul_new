@@ -132,6 +132,22 @@ const PackageForm = ({ initialData }: PackageFormProps) => {
               </span>
             )}
           </div>
+          <div className="grid gap-2">
+            <label htmlFor="validFrom" className="text-sm font-medium">
+              Start date
+            </label>
+            <Input
+              id="validFrom"
+              type="date"
+              {...register("validFrom", { valueAsDate: true })}
+              className={errors.validFrom && "border-red-500"}
+            />
+            {errors.validFrom && (
+              <span className="text-red-500 text-sm">
+                {errors.validFrom.message}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
@@ -166,6 +182,7 @@ const PackageForm = ({ initialData }: PackageFormProps) => {
               ? "Creating..."
               : "Create Package"}
         </Button>
+        <button type="submit">Test</button>
       </div>
     </form>
   );
