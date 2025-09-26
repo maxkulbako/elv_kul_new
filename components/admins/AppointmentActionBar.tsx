@@ -28,12 +28,14 @@ export interface AppointmentActionBarProps {
   view: "dashboard" | "calendar" | "details";
   /** start reschedule flow */
   onReschedule?: (id: string) => void;
+  onOpenDetails?: (id: string) => void;
 }
 
 const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
   appointment,
   view,
   onReschedule,
+  onOpenDetails,
 }) => {
   const isFinalStatus = [
     "CANCELLED",
@@ -112,6 +114,7 @@ const AppointmentActionBar: React.FC<AppointmentActionBarProps> = ({
           <RetryPaymentButton repayUrl={appointment.repayUrl} />
         )}
       </TooltipProvider>
+      {onOpenDetails && <span className="hidden" aria-hidden="true" />}
     </div>
   );
 };

@@ -41,7 +41,7 @@ export const StreamClientProvider = ({ children }: { children: ReactNode }) => {
     });
 
     setVideoClient(myClient);
-  }, [status, session]);
+  }, [status, session, videoClient]); // TO-DO check videoClient dependency
 
   if (!videoClient) {
     return (

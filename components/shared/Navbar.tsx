@@ -8,11 +8,12 @@ import { auth } from "@/auth";
 
 const Navbar = async () => {
   const session = await auth();
+  console.log(session);
 
-  if (!session) {
+  if (!session || !session.user) {
     return (
       <Link href="/sign-in">
-        <CallBackButton text="Клієнтський портал"></CallBackButton>
+        <CallBackButton text="Клієнтський портал" />
       </Link>
     );
   }

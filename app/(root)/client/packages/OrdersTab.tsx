@@ -36,7 +36,10 @@ const OrdersTab = ({ orders }: OrdersTabProps) => {
 
     startCancelTransition(async () => {
       try {
-        const result = await cancelPendingOrderAction(orderId);
+        const result = await cancelPendingOrderAction({
+          orderId: orderId,
+          system: false,
+        }); //TO-DO check cancelPendingOrderAction arguments
         if (result.success) {
           toast.success(result.message || "Order cancelled successfully!", {
             richColors: true,
