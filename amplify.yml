@@ -10,6 +10,23 @@ frontend:
     build:
       commands:
         - pnpm build
+        - echo "AUTH_SECRET=$AUTH_SECRET" >> .env
+        - echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env
+        - echo "DATABASE_URL=$DATABASE_URL" >> .env
+        - echo "DIRECT_URL=$DIRECT_URL" >> .env
+        - echo "WAYFORPAY_MERCHANT_ACCOUNT=$WAYFORPAY_MERCHANT_ACCOUNT" >> .env
+        - echo "WAYFORPAY_SECRET_KEY=$WAYFORPAY_SECRET_KEY" >> .env
+        - echo "NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL" >> .env
+        - echo "NGROK_URL=$NGROK_URL" >> .env
+        - echo "STREAM_SECRET_KEY=$STREAM_SECRET_KEY" >> .env
+        - echo "STREAM_API_KEY=$STREAM_API_KEY" >> .env
+        - echo "ZOOM_VIDEO_SDK_KEY=$ZOOM_VIDEO_SDK_KEY" >> .env
+        - echo "ZOOM_VIDEO_SDK_SECRET=$ZOOM_VIDEO_SDK_SECRET" >> .env
+        - echo "NEXT_PUBLIC_STREAM_API_KEY=$NEXT_PUBLIC_STREAM_API_KEY" >> .env
+        - echo "NEXT_PUBLIC_ZOOM_API_KEY=$NEXT_PUBLIC_ZOOM_API_KEY" >> .env
+        - echo "NEXT_PUBLIC_ZOOM_API_SECRET=$NEXT_PUBLIC_ZOOM_API_SECRET" >> .env
+        - echo "NEXT_PUBLIC_ZOOM_API_USER_ID=$NEXT_PUBLIC_ZOOM_API_USER_ID" >> .env
+        - echo "NEXT_PUBLIC_ZOOM_API_USER_PASSWORD=$NEXT_PUBLIC_ZOOM_API_USER_PASSWORD" >> .env
   artifacts:
     baseDirectory: .next
     files:
