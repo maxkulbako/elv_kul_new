@@ -6,6 +6,9 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest) {
+  // ДОДАЙТЕ ЦЕЙ РЯДОК ДЛЯ ДІАГНОСТИКИ
+  console.log("AUTH_SECRET in middleware:", !!process.env.AUTH_SECRET);
+
   const token = await getToken({
     req,
     secret: process.env.AUTH_SECRET,
