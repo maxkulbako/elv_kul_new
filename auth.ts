@@ -7,6 +7,8 @@ import { compareSync } from "bcrypt-ts-edge";
 const prisma = new PrismaClient();
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
+  debug: process.env.NODE_ENV !== "production",
   pages: {
     signIn: "/sign-in",
     error: "/sign-in",
