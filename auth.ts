@@ -23,36 +23,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        // Check if credentials are valid
+        // Якщо немає email або пароля, не продовжуємо
         if (!credentials.email || !credentials.password) {
-          throw new Error("Invalid credentials");
+          return null;
         }
 
-        // Check if user exists
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
+        try {
+          // Спроба знайти користувача в базі даних
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string },
+          });
 
-        // Check if user exists and has a password
-        if (user && user.password) {
-          // Check if password is valid
-          const isPasswordsMatch = compareSync(
-            credentials.password as string,
-            user.password
-          );
+          // Якщо користувач знайдений і має пароль
+          if (user && user.password) {
+            // Перевіряємо, чи співпадає пароль
+            const isPasswordsMatch = compareSync(
+              credentials.password as string,
+              user.password
+            );
 
-          // Check if password is valid
-          if (isPasswordsMatch) {
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-            };
+            // Якщо паролі співпадають, повертаємо користувача
+            if (isPasswordsMatch) {
+              return {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+              };
+            }
           }
+        } catch (error) {
+          // Логуємо детальну помилку в CloudWatch
+          console.error("AUTHORIZE ERROR:", error);
+          // Повертаємо null, щоб автентифікація не пройшла
+          return null;
         }
 
-        // If user does not exist or password is invalid, return null
+        // Якщо користувач не знайдений або пароль невірний
         return null;
       },
     }),
