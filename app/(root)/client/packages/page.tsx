@@ -8,6 +8,9 @@ import {
 } from "@/lib/actions/price.action";
 import { auth } from "@/auth";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const UserPackagesPage = async ({
   searchParams,
 }: {
