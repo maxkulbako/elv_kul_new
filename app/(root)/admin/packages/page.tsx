@@ -4,6 +4,9 @@ import PackagesSection from "./PackagesSection";
 import GlobalPriceSection from "./GlobalPriceSection";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const ServicePackagesPage: React.FC = async () => {
   return (
     <div className="flex min-h-screen w-full">
