@@ -18,14 +18,15 @@ const Modal = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Dialog defaultOpen={true} open={true} onOpenChange={handleOpenChange}>
-      <DialogHeader className="hidden">
-        <DialogTitle>Create New Service Package</DialogTitle>
-        <DialogDescription>
-          Set up a new package with special pricing for your therapy services.
-        </DialogDescription>
-      </DialogHeader>
-
-      <DialogContent>{children}</DialogContent>
+      <DialogContent>
+        <DialogHeader className="sr-only">
+          <DialogTitle>Create New Service Package</DialogTitle>
+          <DialogDescription>
+            Set up a new package with special pricing for your therapy services.
+          </DialogDescription>
+        </DialogHeader>
+        {children}
+      </DialogContent>
     </Dialog>
   );
 };

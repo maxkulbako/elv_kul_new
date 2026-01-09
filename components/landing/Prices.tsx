@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils/utils";
 import CallBackButton from "../shared/CallBackButton";
+import ContactModal from "../shared/ContactModal";
 import PriceCard from "./PriceCard";
 
 const containerStyles = cn(
@@ -56,7 +57,9 @@ const Prices = () => {
             />
           </div>
         </div>
-        <CallBackButton text="Звʼязатися" />
+        <ContactModal>
+          <CallBackButton text="Звʼязатися" />
+        </ContactModal>
       </div>
     </section>
   );

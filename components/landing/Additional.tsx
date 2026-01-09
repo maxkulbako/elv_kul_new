@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/utils";
-import CallBackButton from "../shared/CallBackButton";
 import Image from "next/image";
 import additionalImage from "@/public/additional_img_desk.webp";
+import Link from "next/link";
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto",
@@ -31,7 +31,16 @@ const Additional = () => {
               <p className="text-[16px] font-medium">
                 Напиши їх мені в Telegram
               </p>
-              <CallBackButton text="Звʼязатися" />
+              <Link
+                href="https://t.me/elvida_kulbako"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-[234px] h-[62px] xl:w-[264px] p-[6px] border-[0.5px] border-[#42412d] rounded-[100px]"
+              >
+                <span className="btn-gradient w-full h-full text-[18px] p-[14px] font-semibold flex items-center justify-center">
+                  Звʼязатися
+                </span>
+              </Link>
             </div>
           </div>
           <div className={imageContainerStyles}>

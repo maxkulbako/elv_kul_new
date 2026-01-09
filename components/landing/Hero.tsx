@@ -1,6 +1,7 @@
 import Image from "next/image";
 import heroImage from "@/public/about_img_desk.webp";
 import CallBackButton from "../shared/CallBackButton";
+import ContactModal from "../shared/ContactModal";
 import { cn } from "@/lib/utils/utils";
 
 const containerStyles = cn(
@@ -92,7 +93,9 @@ const Hero = () => {
 
         {/* Button */}
         <div className={buttonWrapperStyles}>
-          <CallBackButton text="Зв'язатися" />
+          <ContactModal>
+            <CallBackButton text="Зв'язатися" />
+          </ContactModal>
         </div>
       </div>
     </section>
