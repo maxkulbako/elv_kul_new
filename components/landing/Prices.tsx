@@ -6,7 +6,7 @@ const containerStyles = cn(
   "max-w-[1240px] mx-auto flex flex-col items-center justify-center gap-[60px]",
   "px-[32px] py-[60px]",
   "lg:px-[60px]",
-  "xl:py-[100px]",
+  "xl:py-[100px] xl:px-0",
 );
 
 const titleStyles = cn(
@@ -27,26 +27,29 @@ const Prices = () => {
         <div className="w-full overflow-x-hidden">
           <div className="flex flex-col items-center justify-between w-full gap-[30px] lg:flex-row">
             <PriceCard
-              price={500}
-              consultation="1"
+              priceEur={30}
+              priceUah={1500}
+              consultations={1}
+              duration="50 хвилин"
               initial={{ opacity: 0, translateX: -100 }}
               whileInView={{ opacity: 1, translateX: 0 }}
               transition={{ duration: 0.5 }}
             />
             <PriceCard
-              price={2500}
-              consultation="5 + 1"
-              giftNumber={1}
-              isRecommended
+              priceEur={75}
+              priceUah={3750}
+              consultations={3}
+              note="використати протягом 2 місяців"
               isHighlighted
               initial={{ scale: 0.8 }}
               whileInView={{ scale: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
             />
             <PriceCard
-              price={5000}
-              consultation="10 + 2"
-              giftNumber={2}
+              priceEur={110}
+              priceUah={5500}
+              consultations={5}
+              note="використати протягом 3 місяців"
               initial={{ opacity: 0, translateX: 100 }}
               whileInView={{ opacity: 1, translateX: 0 }}
               transition={{ duration: 0.5 }}

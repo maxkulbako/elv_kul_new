@@ -58,12 +58,12 @@ const Hero = () => {
       <div className={containerStyles}>
         {/* Title */}
         <div className={titleStyles}>
-          <p className={titleTextStyles}>НАПРАВЛЮ ТЕБЕ</p>
+          <p className={titleTextStyles}>КОЛИ ХОЧЕТЬСЯ</p>
           <p className={titleTextStyles}>
-            ЯК <span className={highlightTextStyles}>ВИРІШИТИ</span>
+            ЖИТИ <span className={highlightTextStyles}>ЩАСЛИВО, </span>
           </p>
           <p className={titleTextStyles}>
-            СКЛАДНІ <span className={highlightTextStyles}>СИТУАЦІЇ</span>
+            АЛЕ <span className={highlightTextStyles}>ЩОСЬ ЗАВАЖАЄ...</span>
           </p>
         </div>
 
@@ -82,9 +82,9 @@ const Hero = () => {
         {/* Description */}
         <div className={descriptionStyles}>
           <p className={descriptionTextStyles}>
-            Психологиня-консультант.
+            Зі мною ви зможете зупинитися,
             <br />
-            Допомагаю людям віднайти гармонію. Вселяю віру та любов до себе.
+            розібратися й повернутися до себе..
             <br />
             Пізнай себе по-новому!
           </p>

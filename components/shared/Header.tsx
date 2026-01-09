@@ -31,7 +31,7 @@ const Header = () => {
         </Link>
 
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-[40px] text-white text-xl font-display font-bold leading-[10px]">
+          <span className="hidden md:inline text-[40px] text-white text-xl font-display font-bold leading-[10px]">
             MindfulPortal
           </span>
         </Link>

@@ -4,45 +4,59 @@ import { motion, HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/utils/utils";
 
 type PriceCardProps = HTMLMotionProps<"div"> & {
-  price: number;
-  consultation: string;
-  giftNumber?: number;
-  isRecommended?: boolean;
+  priceEur: number;
+  priceUah: number;
+  consultations: number;
+  duration?: string;
+  note?: string;
   isHighlighted?: boolean;
 };
 
 const PriceCard = ({
-  price,
-  consultation,
-  giftNumber,
-  isRecommended,
+  priceEur,
+  priceUah,
+  consultations,
+  duration,
+  note,
   isHighlighted = false,
   ...motionProps
 }: PriceCardProps) => {
   return (
     <motion.div
       className={cn(
-        "w-full min-h-[220px] lg:flex-1 max-w-[350px] flex flex-col items-center justify-between rounded-[8px] border-[3px]",
-        isHighlighted ? "border-olive-primary" : "border-[#E6EAD8]",
+        "w-full min-h-[220px] lg:flex-1 max-w-[350px] flex flex-col items-center rounded-[8px] border-[3px] overflow-hidden",
+        isHighlighted
+          ? "border-olive-primary lg:min-h-[260px] lg:max-w-[380px]"
+          : "border-[#E6EAD8]",
       )}
       {...motionProps}
     >
-      <div className="w-full flex items-center justify-center py-[12px] px-[20px] bg-olive-primary">
-        <h3 className="text-[24px] text-white text-center font-semibold">
-          {price} грн
+      <div className="w-full flex flex-col items-center justify-center py-[16px] px-[20px] bg-olive-primary">
+        <h3 className="text-[28px] text-white text-center font-semibold">
+          {priceEur} €
         </h3>
-      </div>
-      <div className="py-[32px]">
-        <p className="text-[18px] text-center font-medium">{consultation}</p>
-        <p className="text-[18px] text-center">
-          {giftNumber ? `${giftNumber} консультація в` : "консультація"}
+        <p className="text-[16px] text-white/80 text-center">
+          або {priceUah} грн
         </p>
-        {giftNumber && (
-          <p className="text-[18px] text-center font-medium">ПОДАРУНОК</p>
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center py-[32px] px-[20px]">
+        <p className="text-[20px] text-center font-semibold">
+          {consultations}{" "}
+          {consultations === 1
+            ? "консультація"
+            : consultations < 5
+              ? "консультації"
+              : "консультацій"}
+        </p>
+        {duration && (
+          <p className="text-[16px] text-center text-gray-600 mt-[8px]">
+            {duration}
+          </p>
         )}
-        <br />
-        {isRecommended && (
-          <p className="text-[14px] text-center">* рекомендую</p>
+        {note && (
+          <p className="text-[14px] text-center text-gray-500 mt-[12px] italic">
+            * {note}
+          </p>
         )}
       </div>
     </motion.div>
