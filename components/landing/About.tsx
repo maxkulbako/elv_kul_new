@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import aboutImage from "@/public/story_img_desk.webp";
 import { cn } from "@/lib/utils/utils";
+import { motion } from "framer-motion";
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto",
@@ -60,28 +63,53 @@ const About = () => {
 
             {/* Text */}
             <div className={textContainerStyles}>
-              <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
-                Моя історія
-              </h3>
-              <p className="text-[16px] xl:text-[20px]">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+              >
+                <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
+                  Моя історія
+                </h3>
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-[16px] xl:text-[20px]"
+              >
                 Я Ельвіда, психологиня. Працюю з тими, хто хоче жити щасливо і
                 якісно, але зараз відчуває, що щось заважає — навіть якщо поки
                 не зрозуміло, що саме. Ми разом розкладаємо все по поличках, щоб
-                у вас з’явилися внутрішній спокій, опора всередині й зрозумілі
-                кроки, що робити далі.
-                <br />
-                <br />
-              </p>
-              <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
-                Моя місія
-              </h3>
-              <p className="text-[16px] xl:text-[20px]">
+                у вас з&apos;явилися внутрішній спокій, опора всередині й
+                зрозумілі кроки, що робити далі.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <h3 className="text-[18px] text-center font-semibold pt-[32px] pb-[20px] lg:text-[20px] lg:text-left">
+                  Моя місія
+                </h3>
+              </motion.div>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="text-[16px] xl:text-[20px]"
+              >
                 Моя місія - приводити вас до щастя і внутрішнього спокою. До
                 свободи обирати своє життя без внутрішніх блоків, установок та
                 обмежень. Про масштаб мислення, сміливість мріяти, дозволяти
                 собі бути собою і отримувати задоволення від процесу під назвою
                 життя. Я живу так сама - це моя філософія.
-              </p>
+              </motion.p>
             </div>
           </div>
         </div>
