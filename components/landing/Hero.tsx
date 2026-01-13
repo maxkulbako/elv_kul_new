@@ -1,6 +1,7 @@
 import Image from "next/image";
 import heroImage from "@/public/about_img_desk.webp";
 import CallBackButton from "../shared/CallBackButton";
+import ContactModal from "../shared/ContactModal";
 import { cn } from "@/lib/utils/utils";
 
 const containerStyles = cn(
@@ -58,12 +59,12 @@ const Hero = () => {
       <div className={containerStyles}>
         {/* Title */}
         <div className={titleStyles}>
-          <p className={titleTextStyles}>НАПРАВЛЮ ТЕБЕ</p>
+          <p className={titleTextStyles}>КОЛИ ХОЧЕТЬСЯ</p>
           <p className={titleTextStyles}>
-            ЯК <span className={highlightTextStyles}>ВИРІШИТИ</span>
+            ЖИТИ <span className={highlightTextStyles}>ЩАСЛИВО, </span>
           </p>
           <p className={titleTextStyles}>
-            СКЛАДНІ <span className={highlightTextStyles}>СИТУАЦІЇ</span>
+            АЛЕ <span className={highlightTextStyles}>ЩОСЬ ЗАВАЖАЄ...</span>
           </p>
         </div>
 
@@ -82,9 +83,9 @@ const Hero = () => {
         {/* Description */}
         <div className={descriptionStyles}>
           <p className={descriptionTextStyles}>
-            Психологиня-консультант.
+            Зі мною ви зможете зупинитися,
             <br />
-            Допомагаю людям віднайти гармонію. Вселяю віру та любов до себе.
+            розібратися й повернутися до себе..
             <br />
             Пізнай себе по-новому!
           </p>
@@ -92,7 +93,9 @@ const Hero = () => {
 
         {/* Button */}
         <div className={buttonWrapperStyles}>
-          <CallBackButton text="Зв'язатися" />
+          <ContactModal>
+            <CallBackButton text="Зв'язатися" />
+          </ContactModal>
         </div>
       </div>
     </section>

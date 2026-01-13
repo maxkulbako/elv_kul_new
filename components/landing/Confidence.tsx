@@ -1,6 +1,9 @@
+"use client";
+
 import { cn } from "@/lib/utils/utils";
 import Image from "next/image";
 import confidenceImage from "@/public/confidence_img_desk.webp";
+import { motion } from "framer-motion";
 
 const sectionStyles = cn("relative max-w-[1440px] mx-auto", "gap-8 w-full");
 
@@ -34,28 +37,39 @@ const Confidence = () => {
         <div className="flex flex-col items-center p-6 sm:p-12 gap-8 bg-white/5 backdrop-blur-[20px] shadow-[0px_2px_20px_0px_rgba(0,0,0,0.25)]">
           <div className="w-full sm:min-w-[395px] lg:min-w-[700px]">
             <h2 className="text-center text-white text-[28px] font-display leading-[120%] tracking-[0%] pb-[20px] border-b-[3px] border-olive-primary xl:text-[48px]">
-              100% КОНФІДЕНЦІЙНОСТІ
+              МОЯ ОСОБЛИВІСТЬ У РОБОТІ
             </h2>
           </div>
 
           <p className="font-montserrat text-base lg:text-xl text-white text-center w-full font-normal lg:font-extralight">
-            Я дію відповідно до етичних стандартів УАПП
+            Моя сильна сторона - глибина і щирий інтерес.
           </p>
 
-          <p className="font-montserrat text-base lg:text-xl text-white text-center w-full font-normal lg:font-extralight">
+          <p className="font-montserrat text-base lg:text-xl text-white text-center w-full font-normal lg:font-extralight max-w-[800px] mx-auto">
             Завжди враховую інтереси своїх клієнтів, усвідомлюю
             <br />
-            межі своїх знань,
+            Мені справді важливо, як ви почуваєтесь і що з вами відбувається.
+            Тому з часом ви починаєте більше довіряти, розслаблятися і можете
+            говорити чесно - без напруги і страху, що вас оцінять.
             <br />
-            досвіду та навичок.
+            <br />Я багато працюю над собою, своєю якістю життя і професійністю.
+            І мій досвід допомагає створити такий простір, де вам безпечно і
+            по-простому і легко.
           </p>
 
-          <Image
-            src="/small_logo.svg"
-            alt="Small logo"
-            width={42}
-            height={42}
-          />
+          <motion.div
+            initial={{ rotate: 0 }}
+            whileInView={{ rotate: 360 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            <Image
+              src="/small_logo.svg"
+              alt="Small logo"
+              width={42}
+              height={42}
+            />
+          </motion.div>
         </div>
       </div>
     </section>

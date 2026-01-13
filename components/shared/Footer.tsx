@@ -1,8 +1,13 @@
 import { cn } from "@/lib/utils/utils";
 import Image from "next/image";
+import Link from "next/link";
 import smallLogo from "@/public/small_logo.svg";
 import logo from "@/public/logo.png";
 import { Icons } from "../shared/icons";
+
+const TELEGRAM_LINK = "https://t.me/elvida_kulbako";
+const INSTAGRAM_LINK = "https://instagram.com/psy.elvida_kulbako";
+const FACEBOOK_LINK = "https://facebook.com/elvida.tretyak";
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto flex flex-col items-center justify-center gap-[60px]",
@@ -38,9 +43,36 @@ const Footer = () => {
             <p>home@psy-elvida.com</p>
           </div>
           <div className="flex gap-[20px]">
-            <Icons.telegram className="w-[56px] h-[56px]" color="#fff" />
-            <Icons.instagram className="w-[56px] h-[56px]" color="#fff" />
-            <Icons.facebook className="w-[56px] h-[56px]" color="#fff" />
+            <Link
+              href={TELEGRAM_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Icons.telegram
+                className="w-[56px] h-[56px] hover:opacity-80 transition-opacity"
+                color="#fff"
+              />
+            </Link>
+            <Link
+              href={INSTAGRAM_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Icons.instagram
+                className="w-[56px] h-[56px] hover:opacity-80 transition-opacity"
+                color="#fff"
+              />
+            </Link>
+            <Link
+              href={FACEBOOK_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Icons.facebook
+                className="w-[56px] h-[56px] hover:opacity-80 transition-opacity"
+                color="#fff"
+              />
+            </Link>
           </div>
           <p className="text-[16px] font-medium text-white">
             &copy; {new Date().getFullYear()} Elvida Kulbako
