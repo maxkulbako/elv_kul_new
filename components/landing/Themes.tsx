@@ -1,7 +1,10 @@
+"use client";
+
 import { cn } from "@/lib/utils/utils";
 import Image from "next/image";
 import themesImage from "@/public/themes_img_desk.webp";
 import questionImage from "@/public/questions_img_desk.webp";
+import { motion } from "framer-motion";
 
 const sectionStyles = cn("relative max-w-[1440px] mx-auto", "gap-8 w-full");
 
@@ -132,35 +135,41 @@ const Themes = () => {
                 Запити, з якими <br /> звертаються клієнти
               </h2>
             </div>
-            <div className="flex flex-wrap w-full gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4 sm:gap-5">
               {questionsData.map((question, index) => (
-                <div
+                <motion.div
                   key={index}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.5,
+                    delay: index * 0.1,
+                    ease: "easeOut",
+                  }}
                   className={cn(
-                    "w-[calc(50%-10px)] min-h-[70px]",
-                    "px-8 py-4 md:px-10 md:py-5",
-                    "flex items-center justify-center relative",
-                    "rounded-[148px]",
+                    "px-6 py-4 sm:px-8 sm:py-5",
+                    "flex items-center justify-start relative",
+                    "rounded-full",
                     "shadow-[0px_2px_4px_0px_rgba(0,0,0,0.25)]",
-                    "bg-olive-primary",
-                    "before:content-[url('/quotes.svg')]",
-                    "before:absolute before:top-[50%] before:left-4",
-                    "before:-translate-y-1/2",
-                    "before:opacity-50 before:scale-75",
+                    "bg-olive-primary/90",
+                    "before:content-['\u201C']",
+                    "before:absolute before:left-4 sm:before:left-5",
+                    "before:text-white/40 before:text-[24px] before:font-serif",
                   )}
                 >
                   <p
                     className={cn(
-                      "text-[10px] md:text-[16px]",
-                      "font-medium lg:font-semibold",
-                      "text-white text-center",
-                      "break-words whitespace-normal",
-                      "pl-6",
+                      "text-[14px] sm:text-[15px] md:text-[16px]",
+                      "font-medium",
+                      "text-white",
+                      "pl-6 sm:pl-7",
+                      "leading-[1.4]",
                     )}
                   >
                     {question}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

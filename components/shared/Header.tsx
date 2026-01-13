@@ -1,7 +1,6 @@
-import Image from "next/image";
-import Link from "next/link";
 import { cn } from "@/lib/utils/utils";
 import Navbar from "../shared/Navbar";
+import AnimatedLogo from "./AnimatedLogo";
 
 const containerStyles = cn(
   "bg-olive-primary border-b-[1px] border-[#42412D]",
@@ -20,21 +19,7 @@ const Header = () => {
   return (
     <div className={containerStyles}>
       <header className={headerStyles}>
-        <Link href="/">
-          <Image
-            src="/logo.png"
-            alt="main_logo"
-            width={130}
-            height={48}
-            priority
-          />
-        </Link>
-
-        <Link href="/" className="flex items-center space-x-2">
-          <span className="hidden md:inline text-[40px] text-white text-xl font-display font-bold leading-[10px]">
-            MindfulPortal
-          </span>
-        </Link>
+        <AnimatedLogo />
         <Navbar />
       </header>
     </div>
