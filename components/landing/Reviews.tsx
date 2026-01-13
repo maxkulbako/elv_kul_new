@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useLayoutEffect, useCallback } from "react";
 import { cn } from "@/lib/utils/utils";
 import { ChevronLeft, ChevronRight, User } from "lucide-react";
 
@@ -167,7 +167,8 @@ const Reviews = () => {
     calculateScales();
   }, [calculateScales]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- DOM measurements require setState after layout
     calculateScales();
     window.addEventListener("resize", calculateScales);
     return () => window.removeEventListener("resize", calculateScales);

@@ -1,7 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import programsImage from "@/public/programs_img_desk.webp";
 import { cn } from "@/lib/utils/utils";
-import ProgramCard from "./ProgramCard";
+import { motion } from "framer-motion";
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto",
@@ -11,10 +13,10 @@ const containerStyles = cn(
 );
 
 const titleStyles = cn(
-  "text-[28px] font-display text-center leading-[120%] tracking-[0%]]",
+  "text-[28px] font-display text-center leading-[120%] tracking-[0%]",
   "pb-[20px] border-b-[3px] border-olive-primary",
-  "lg:max-w-[400px] lg:text-right lg:self-end",
-  "xl:text-[48px] xl:max-w-[650px]",
+  "lg:max-w-[500px] lg:text-right lg:self-end",
+  "xl:text-[48px] xl:max-w-[700px]",
 );
 
 const imageContainerStyles = cn(
@@ -26,25 +28,14 @@ const imageContainerStyles = cn(
 );
 
 const Programs = () => {
-  const programsData = [
-    {
-      title: "Корпоративні лекції",
-      description:
-        "Звертайтесь до мене щодо проведення лекцій чи тренінгів, щоб збільшити ефективність своїх співробітників для збільшення доходу.",
-    },
-    {
-      title: "Некомерційне партнерство",
-      description: "Я активно підтримую ініціативи, які дотичні до психоосвіти",
-    },
-    {
-      title: "Корпоративні лекції",
-      description:
-        "Звертайтесь до мене щодо проведення лекцій чи тренінгів, щоб збільшити ефективність своїх співробітників для збільшення доходу.",
-    },
-    {
-      title: "Некомерційне партнерство",
-      description: "Я активно підтримую ініціативи, які дотичні до психоосвіти",
-    },
+  const benefitsData = [
+    "Знайдете внутрішню опору і почнете ставитися до себе м'якше.",
+    "Зменшите вигорання і повернете собі енергію.",
+    "Відчуєте більше впевненості і зможете рухатися до своїх цілей.",
+    "Навчитеся будувати кордони та казати «ні» без провини.",
+    "Навчитеся краще керувати тривогою і заспокоювати себе.",
+    "Послабите самокритику, синдром самозванця і потребу бути ідеальними.",
+    "Усвідомите свої справжні бажання і почнете діяти більш по-своєму.",
   ];
 
   return (
@@ -57,32 +48,42 @@ const Programs = () => {
 
           {/* Title */}
           <h2 className={titleStyles}>
-            &quot;Мої програми. <br className="hidden xl:block" /> Персональні
-            та групові&quot;
+            Що ви отримаєте в результаті роботи зі мною
           </h2>
 
-          {/* Image and Programs */}
+          {/* Image and Benefits */}
           <div className="flex flex-col gap-[32px] w-full h-full lg:flex-row lg:justify-between">
             <div className={imageContainerStyles}>
               <Image
                 src={programsImage}
-                alt="Programs"
+                alt="Результати роботи"
                 fill
                 sizes="(max-width: 1024px) 420px, (max-width: 1280px) 450px, 650px"
                 className="object-cover object-top"
               />
             </div>
 
-            {/* Programs */}
-            <div className="flex flex-col gap-[16px] justify-center">
-              {programsData.map((program, index) => (
-                <ProgramCard
+            {/* Benefits List */}
+            <div className="flex flex-col gap-[12px] justify-center lg:max-w-[550px]">
+              {benefitsData.map((benefit, index) => (
+                <motion.div
                   key={index}
-                  index={index}
-                  title={program.title}
-                  description={program.description}
-                  className={index === 3 ? "hidden xl:flex xl:flex-col" : ""}
-                />
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.3,
+                    delay: index * 0.1,
+                  }}
+                  className="flex items-start gap-[16px] bg-[#F5F6F0] p-[20px] rounded-[4px]"
+                >
+                  <span className="text-olive-primary text-[20px] font-semibold flex-shrink-0">
+                    ✓
+                  </span>
+                  <p className="text-[16px] leading-[150%] xl:text-[18px]">
+                    {benefit}
+                  </p>
+                </motion.div>
               ))}
             </div>
           </div>
