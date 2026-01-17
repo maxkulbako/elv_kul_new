@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils/utils";
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto",
-  "px-8 pb-17 pt-8",
+  "px-4 pb-17 pt-8",
   "xl:px-24",
   "landing-grid",
 );

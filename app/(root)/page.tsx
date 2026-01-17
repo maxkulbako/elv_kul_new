@@ -5,6 +5,7 @@ import Themes from "@/components/landing/Themes";
 import Prices from "@/components/landing/Prices";
 import Confidence from "@/components/landing/Confidence";
 import Programs from "@/components/landing/Programs";
+import Education from "@/components/landing/Education";
 import Reviews from "@/components/landing/Reviews";
 import FAQ from "@/components/landing/FAQ";
 import Additional from "@/components/landing/Additional";
@@ -22,6 +23,7 @@ const HomePage = () => {
       <Prices />
       <Confidence />
       <Programs />
+      <Education />
       <Reviews />
       <FAQ />
       <Additional />

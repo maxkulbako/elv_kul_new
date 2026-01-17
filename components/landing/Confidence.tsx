@@ -9,7 +9,7 @@ const sectionStyles = cn("relative max-w-[1440px] mx-auto", "gap-8 w-full");
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto relative z-10 flex flex-col items-center justify-center gap-[32px]",
-  "px-[32px] py-[60px]",
+  "px-[16px] py-[60px]",
   "lg:px-[60px]",
   "xl:py-[100px] xl:px-0",
 );
@@ -46,8 +46,6 @@ const Confidence = () => {
           </p>
 
           <p className="font-montserrat text-base lg:text-xl text-white text-center w-full font-normal lg:font-extralight max-w-[800px] mx-auto">
-            Завжди враховую інтереси своїх клієнтів, усвідомлюю
-            <br />
             Мені справді важливо, як ви почуваєтесь і що з вами відбувається.
             Тому з часом ви починаєте більше довіряти, розслаблятися і можете
             говорити чесно - без напруги і страху, що вас оцінять.

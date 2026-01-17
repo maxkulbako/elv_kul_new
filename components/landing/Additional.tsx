@@ -5,7 +5,7 @@ import Link from "next/link";
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto",
-  "px-[32px] py-[60px]",
+  "px-[16px] py-[60px]",
   "lg:px-[60px]",
   "xl:py-[100px] xl:px-0",
 );

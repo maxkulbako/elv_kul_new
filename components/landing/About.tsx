@@ -8,7 +8,7 @@ import { motion, useInView } from "framer-motion";
 
 const containerStyles = cn(
   "max-w-[1240px] mx-auto",
-  "px-[32px] py-[60px]",
+  "px-[16px] py-[60px]",
   "lg:px-[60px]",
   "xl:py-[100px] xl:px-0",
 );
@@ -107,7 +107,7 @@ const About = () => {
                 }}
               >
                 <h3 className="text-[18px] text-center font-semibold pb-[20px] lg:text-[20px] lg:text-left">
-                  Моя історія
+                  Про мене
                 </h3>
               </motion.div>
               <motion.p
