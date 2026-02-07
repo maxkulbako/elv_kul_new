@@ -71,7 +71,7 @@ const Themes = () => {
       <div className={containerStyles}>
         {/* Page number */}
         <p className="text-[16px] text-white italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-end">
-          02
+          04
         </p>
         <div className="flex justify-between gap-[60px] xl:px-[60px]">
           <div className="flex flex-col gap-[30px] xl:gap-[60px]">
@@ -121,7 +121,7 @@ const Themes = () => {
       <div className={containerStyles}>
         {/* Page number */}
         <p className="text-[16px] text-white italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-start">
-          03
+          05
         </p>
         <div className="flex justify-between gap-[60px] xl:px-[60px]">
           <div className="relative w-[360px] h-[520px] rounded-[4px] border-[1px] border-white hidden lg:block shrink-0">

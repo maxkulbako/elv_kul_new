@@ -233,7 +233,7 @@ const Education = () => {
         <div className="max-w-[1240px] mx-auto px-[16px] lg:px-[60px] xl:px-0 relative z-10">
           {/* Page number */}
           <p className="text-[16px] italic border-b-[2px] border-olive-primary w-fit hidden xl:block ml-auto mb-[40px]">
-            06
+            08
           </p>
 
           {/* Title and Intro Card */}

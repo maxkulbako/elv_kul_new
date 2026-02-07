@@ -44,8 +44,8 @@ const Programs = () => {
     <section>
       <div className={containerStyles}>
         <div className="flex flex-col items-center gap-[32px]">
-          <p className="text-[16px] italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-start">
-            06
+          <p className="text-[16px] italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-end">
+            02
           </p>
 
           {/* Title */}

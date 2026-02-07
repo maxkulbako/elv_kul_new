@@ -30,8 +30,8 @@ const Confidence = () => {
       {/* Content */}
       <div className={containerStyles}>
         {/* Page number */}
-        <p className="text-[16px] text-white italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-end">
-          05
+        <p className="text-[16px] text-white italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-start">
+          07
         </p>
 
         <div className="flex flex-col items-center p-6 sm:p-12 gap-8 bg-white/5 backdrop-blur-[20px] shadow-[0px_2px_20px_0px_rgba(0,0,0,0.25)]">

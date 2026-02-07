@@ -22,7 +22,7 @@ const Prices = () => {
       <div className={containerStyles}>
         {/* Page number */}
         <p className="text-[16px] italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-end">
-          04
+          06
         </p>
         <h2 className={titleStyles}>Тарифи</h2>
         <div className="w-full overflow-x-hidden">

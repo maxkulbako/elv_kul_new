@@ -18,11 +18,11 @@ const HomePage = () => {
   return (
     <div>
       <Hero />
+      <Programs />
       <About />
       <Themes />
       <Prices />
       <Confidence />
-      <Programs />
       <Education />
       <Reviews />
       <FAQ />

@@ -66,12 +66,9 @@ const FAQ = () => {
   return (
     <section className={sectionStyles}>
       <div className={containerStyles}>
-        <p className="text-[16px] italic text-white border-b-[2px] border-black w-fit hidden xl:block self-end">
-          07
-        </p>
         <div className="w-full flex flex-col items-center justify-center gap-[32px] lg:w-[720px]">
           <h2 className="text-center text-white text-[28px] font-display leading-[120%] tracking-[0%] pb-[20px] border-b-[3px] border-white xl:text-[48px] max-w-[580px]">
-            Відповіді на чісті запитання
+            Відповіді на часті запитання
           </h2>
           <div className="w-full flex flex-col items-center justify-center gap-[32px]">
             {faqItems.map((item, index) => (

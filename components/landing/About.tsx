@@ -50,7 +50,7 @@ const About = () => {
       <div className={cn(containerStyles, "relative z-10")}>
         <div className="flex flex-col items-center gap-[32px]">
           <p className="text-[16px] italic border-b-[2px] border-olive-primary w-fit hidden xl:block self-start">
-            01
+            03
           </p>
 
           {/* Title */}

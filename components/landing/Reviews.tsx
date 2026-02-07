@@ -187,11 +187,6 @@ const Reviews = () => {
   return (
     <section className="py-[60px] xl:py-[100px]">
       <div className="max-w-[1240px] mx-auto px-[16px] lg:px-[60px] xl:px-0">
-        {/* Page number */}
-        <p className="text-[16px] italic border-b-[2px] border-olive-primary w-fit hidden xl:block ml-auto mb-[40px]">
-          01
-        </p>
-
         {/* Title */}
         <h2 className={titleStyles}>
           Найцінніше для мене - <br />

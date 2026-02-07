@@ -39,7 +39,7 @@ const Footer = () => {
             />
           </div>
           <div className="text-white text-[18px] text-center">
-            <p>+38 098 123 45 67</p>
+            <p>+38 067 353 07 75</p>
             <p>home@psy-elvida.com</p>
           </div>
           <div className="flex gap-[20px]">
